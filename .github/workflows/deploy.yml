@@ -23,21 +23,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "yarn"
+
+      # package.jsonで指定されたYarn 4.xを使用するためにCorepackを有効化する
+      - name: Enable Corepack
+        run: corepack enable
+
+      # 依存関係をインストールする（Yarn v4以降の仕様に合わせて --immutable を使用）
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
+
       - name: Build
         run: yarn build
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: "./dist"
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
