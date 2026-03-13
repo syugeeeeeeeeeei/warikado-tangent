@@ -4,6 +4,7 @@ import type { ViewState } from '../../types/domain';
 interface AppHeaderProps {
   currentView: ViewState;
   eventName: string;
+  eventNameMaxLength: number;
   onEventNameChange: (name: string) => void;
   onBackHome: () => void;
 }
@@ -11,6 +12,7 @@ interface AppHeaderProps {
 export const AppHeader = ({
   currentView,
   eventName,
+  eventNameMaxLength,
   onEventNameChange,
   onBackHome,
 }: AppHeaderProps) => {
@@ -34,13 +36,18 @@ export const AppHeader = ({
           <h1 className="text-xl font-extrabold text-orange-600 tracking-tight">勾配割り勘ツール</h1>
           {/* ホームではイベント名を直接編集可能。その他画面では読み取り専用表示。 */}
           {currentView === 'home' ? (
-            <input
-              type="text"
-              value={eventName}
-              onChange={(event) => onEventNameChange(event.target.value)}
-              className="bg-transparent text-center text-sm font-bold text-gray-500 focus:outline-none w-full max-w-[250px] placeholder-gray-300 mt-0.5 border-b border-transparent focus:border-orange-200 transition-colors"
-              placeholder="イベント名を入力"
-            />
+            <>
+              <input
+                type="text"
+                value={eventName}
+                onChange={(event) => onEventNameChange(event.target.value)}
+                className="bg-transparent text-center text-sm font-bold text-gray-500 focus:outline-none w-full max-w-[250px] placeholder-gray-300 mt-0.5 border-b border-transparent focus:border-orange-200 transition-colors"
+                placeholder="イベント名を入力"
+              />
+              <span className="text-[10px] text-gray-300 mt-0.5">
+                {Array.from(eventName).length}/{eventNameMaxLength}
+              </span>
+            </>
           ) : (
             <h2 className="text-sm font-bold text-gray-500 truncate max-w-[200px] mt-0.5">
               {eventName || 'イベント名未設定'}

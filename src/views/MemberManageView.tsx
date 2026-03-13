@@ -1,7 +1,10 @@
 import { Check, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
+import { MEMBER_NAME_MAX_LENGTH } from '../constants/inputLimits';
 import type { EventData, Member } from '../types/domain';
+import { createShortSequentialId } from '../utils/id';
+import { limitByCodePoints } from '../utils/textLimit';
 
 interface MemberManageViewProps {
   eventData: EventData;
@@ -19,6 +22,9 @@ export const MemberManageView = ({
   // インライン編集対象 ID と編集中テキスト。
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+  // 超過入力時トーストを連打しないためのフラグ。
+  const [newMemberLimitToastShown, setNewMemberLimitToastShown] = useState(false);
+  const [editingMemberLimitToastShown, setEditingMemberLimitToastShown] = useState(false);
 
   // 表記ゆれを吸収して重複判定するための正規化。
   const normalizeName = (name: string) => name.trim().toLocaleLowerCase();
@@ -44,7 +50,10 @@ export const MemberManageView = ({
     }
 
     const newMember: Member = {
-      id: crypto.randomUUID(),
+      id: createShortSequentialId(
+        'm',
+        eventData.members.map((member) => member.id),
+      ),
       name: nextName,
     };
 
@@ -53,6 +62,7 @@ export const MemberManageView = ({
       members: [...eventData.members, newMember],
     });
     setNewMemberName('');
+    setNewMemberLimitToastShown(false);
   };
 
   // メンバー削除時は、全精算項目から該当メンバーの ratio も同時に削除して整合性を保つ。
@@ -70,13 +80,19 @@ export const MemberManageView = ({
   // インライン編集開始。
   const startEditingMember = (member: Member) => {
     setEditingMemberId(member.id);
-    setEditingName(member.name);
+    const { value, wasTrimmed } = limitByCodePoints(
+      member.name,
+      MEMBER_NAME_MAX_LENGTH,
+    );
+    setEditingName(value);
+    setEditingMemberLimitToastShown(wasTrimmed);
   };
 
   // インライン編集キャンセル。
   const cancelEditingMember = () => {
     setEditingMemberId(null);
     setEditingName('');
+    setEditingMemberLimitToastShown(false);
   };
 
   // メンバー名保存処理。
@@ -99,6 +115,38 @@ export const MemberManageView = ({
     cancelEditingMember();
   };
 
+  // 新規入力欄の文字数を制限し、超過時に一度だけ通知する。
+  const handleNewMemberNameChange = (rawName: string) => {
+    const { value, wasTrimmed } = limitByCodePoints(rawName, MEMBER_NAME_MAX_LENGTH);
+    setNewMemberName(value);
+
+    if (wasTrimmed && !newMemberLimitToastShown) {
+      showToast(`メンバー名は${MEMBER_NAME_MAX_LENGTH}文字までです。`);
+      setNewMemberLimitToastShown(true);
+      return;
+    }
+
+    if (!wasTrimmed && newMemberLimitToastShown) {
+      setNewMemberLimitToastShown(false);
+    }
+  };
+
+  // 編集入力欄の文字数制限。
+  const handleEditingNameChange = (rawName: string) => {
+    const { value, wasTrimmed } = limitByCodePoints(rawName, MEMBER_NAME_MAX_LENGTH);
+    setEditingName(value);
+
+    if (wasTrimmed && !editingMemberLimitToastShown) {
+      showToast(`メンバー名は${MEMBER_NAME_MAX_LENGTH}文字までです。`);
+      setEditingMemberLimitToastShown(true);
+      return;
+    }
+
+    if (!wasTrimmed && editingMemberLimitToastShown) {
+      setEditingMemberLimitToastShown(false);
+    }
+  };
+
   return (
     <div className="animate-fade-in-up space-y-6">
       <h2 className="text-xl font-bold text-gray-800">メンバーの登録・編集</h2>
@@ -107,9 +155,9 @@ export const MemberManageView = ({
         <input
           type="text"
           value={newMemberName}
-          onChange={(event) => setNewMemberName(event.target.value)}
+          onChange={(event) => handleNewMemberNameChange(event.target.value)}
           onKeyDown={(event) => event.key === 'Enter' && addMember()}
-          placeholder="名前を入力（例: 太郎）"
+          placeholder={`名前を入力（最大${MEMBER_NAME_MAX_LENGTH}文字）`}
           className="flex-1 bg-transparent border-none px-3 py-2 focus:outline-none text-gray-700 font-medium"
         />
         <button
@@ -132,9 +180,9 @@ export const MemberManageView = ({
                 <input
                   type="text"
                   value={editingName}
-                  onChange={(event) => setEditingName(event.target.value)}
+                  onChange={(event) => handleEditingNameChange(event.target.value)}
                   onKeyDown={(event) => event.key === 'Enter' && saveMemberName(member.id)}
-                  placeholder="名前を入力"
+                  placeholder={`名前を入力（最大${MEMBER_NAME_MAX_LENGTH}文字）`}
                   className="flex-1 bg-gray-50 border border-emerald-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-200 text-gray-700 font-medium"
                 />
                 <button

@@ -1,0 +1,2375 @@
+{
+  "name": "team-retreat-2026",
+  "members": [
+    {
+      "id": "m0",
+      "name": "Aki"
+    },
+    {
+      "id": "m1",
+      "name": "Nao"
+    },
+    {
+      "id": "m2",
+      "name": "Ren"
+    },
+    {
+      "id": "m3",
+      "name": "Mio"
+    },
+    {
+      "id": "m4",
+      "name": "Kazu"
+    },
+    {
+      "id": "m5",
+      "name": "Yui"
+    },
+    {
+      "id": "m6",
+      "name": "Sora"
+    },
+    {
+      "id": "m7",
+      "name": "Rin"
+    },
+    {
+      "id": "m8",
+      "name": "Ken"
+    },
+    {
+      "id": "m9",
+      "name": "Aya"
+    },
+    {
+      "id": "ma",
+      "name": "Ryo"
+    },
+    {
+      "id": "mb",
+      "name": "Nina"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "e0",
+      "name": "費目1",
+      "amount": 1200,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 5.68
+        },
+        {
+          "memberId": "m1",
+          "ratio": 6.29
+        },
+        {
+          "memberId": "m2",
+          "ratio": 7.1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 0
+        },
+        {
+          "memberId": "m4",
+          "ratio": 8.62
+        },
+        {
+          "memberId": "m5",
+          "ratio": 9.94
+        },
+        {
+          "memberId": "m6",
+          "ratio": 0
+        },
+        {
+          "memberId": "m7",
+          "ratio": 12.17
+        },
+        {
+          "memberId": "m8",
+          "ratio": 14
+        },
+        {
+          "memberId": "m9",
+          "ratio": 0
+        },
+        {
+          "memberId": "ma",
+          "ratio": 16.94
+        },
+        {
+          "memberId": "mb",
+          "ratio": 19.26
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m0"
+    },
+    {
+      "id": "e1",
+      "name": "費目2",
+      "amount": 1931,
+      "payerId": "m1",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m7"
+    },
+    {
+      "id": "e2",
+      "name": "費目3",
+      "amount": 2662,
+      "payerId": "m2",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 7.37
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 8.32
+        },
+        {
+          "memberId": "m3",
+          "ratio": 9.26
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 10.95
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.42
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 14.84
+        },
+        {
+          "memberId": "m9",
+          "ratio": 16.84
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 20
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m3"
+    },
+    {
+      "id": "e3",
+      "name": "費目4",
+      "amount": 3393,
+      "payerId": "m3",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 0
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 0
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m8"
+    },
+    {
+      "id": "e4",
+      "name": "費目5",
+      "amount": 4124,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 8.09
+        },
+        {
+          "memberId": "m1",
+          "ratio": 8.67
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 9.83
+        },
+        {
+          "memberId": "m4",
+          "ratio": 10.89
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.72
+        },
+        {
+          "memberId": "m7",
+          "ratio": 14.26
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 16.76
+        },
+        {
+          "memberId": "ma",
+          "ratio": 18.78
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m6"
+    },
+    {
+      "id": "e5",
+      "name": "費目6",
+      "amount": 4855,
+      "payerId": "m5",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m2"
+    },
+    {
+      "id": "e6",
+      "name": "費目7",
+      "amount": 5586,
+      "payerId": "m6",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 7.2
+        },
+        {
+          "memberId": "m2",
+          "ratio": 7.71
+        },
+        {
+          "memberId": "m3",
+          "ratio": 0
+        },
+        {
+          "memberId": "m4",
+          "ratio": 8.65
+        },
+        {
+          "memberId": "m5",
+          "ratio": 9.51
+        },
+        {
+          "memberId": "m6",
+          "ratio": 10.52
+        },
+        {
+          "memberId": "m7",
+          "ratio": 11.67
+        },
+        {
+          "memberId": "m8",
+          "ratio": 12.97
+        },
+        {
+          "memberId": "m9",
+          "ratio": 0
+        },
+        {
+          "memberId": "ma",
+          "ratio": 15.06
+        },
+        {
+          "memberId": "mb",
+          "ratio": 16.71
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m5"
+    },
+    {
+      "id": "e7",
+      "name": "費目8",
+      "amount": 6317,
+      "payerId": "m7",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m4"
+    },
+    {
+      "id": "e8",
+      "name": "費目9",
+      "amount": 7048,
+      "payerId": "m8",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 8.71
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 9.41
+        },
+        {
+          "memberId": "m3",
+          "ratio": 10.11
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 11.35
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.44
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 14.23
+        },
+        {
+          "memberId": "m9",
+          "ratio": 15.71
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 18.04
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m0"
+    },
+    {
+      "id": "e9",
+      "name": "費目10",
+      "amount": 7779,
+      "payerId": "m9",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 0
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 0
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m1"
+    },
+    {
+      "id": "ea",
+      "name": "費目11",
+      "amount": 8510,
+      "payerId": "ma",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 9.17
+        },
+        {
+          "memberId": "m1",
+          "ratio": 9.61
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 10.48
+        },
+        {
+          "memberId": "m4",
+          "ratio": 11.28
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.66
+        },
+        {
+          "memberId": "m7",
+          "ratio": 13.83
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 15.72
+        },
+        {
+          "memberId": "ma",
+          "ratio": 17.25
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m3"
+    },
+    {
+      "id": "eb",
+      "name": "費目12",
+      "amount": 9241,
+      "payerId": "mb",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "mb"
+    },
+    {
+      "id": "ec",
+      "name": "費目13",
+      "amount": 9972,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 8.04
+        },
+        {
+          "memberId": "m1",
+          "ratio": 8.38
+        },
+        {
+          "memberId": "m2",
+          "ratio": 8.84
+        },
+        {
+          "memberId": "m3",
+          "ratio": 0
+        },
+        {
+          "memberId": "m4",
+          "ratio": 9.7
+        },
+        {
+          "memberId": "m5",
+          "ratio": 10.45
+        },
+        {
+          "memberId": "m6",
+          "ratio": 0
+        },
+        {
+          "memberId": "m7",
+          "ratio": 11.71
+        },
+        {
+          "memberId": "m8",
+          "ratio": 12.74
+        },
+        {
+          "memberId": "m9",
+          "ratio": 0
+        },
+        {
+          "memberId": "ma",
+          "ratio": 14.41
+        },
+        {
+          "memberId": "mb",
+          "ratio": 15.73
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m8"
+    },
+    {
+      "id": "ed",
+      "name": "費目14",
+      "amount": 10703,
+      "payerId": "m1",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m1"
+    },
+    {
+      "id": "ee",
+      "name": "費目15",
+      "amount": 11434,
+      "payerId": "m2",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 9.49
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 10.05
+        },
+        {
+          "memberId": "m3",
+          "ratio": 10.6
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 11.59
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.45
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 13.87
+        },
+        {
+          "memberId": "m9",
+          "ratio": 15.04
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 16.91
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m9"
+    },
+    {
+      "id": "ef",
+      "name": "費目16",
+      "amount": 12165,
+      "payerId": "m3",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 0
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 0
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m4"
+    },
+    {
+      "id": "eg",
+      "name": "費目17",
+      "amount": 12896,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 9.82
+        },
+        {
+          "memberId": "m1",
+          "ratio": 10.18
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 10.88
+        },
+        {
+          "memberId": "m4",
+          "ratio": 11.52
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.63
+        },
+        {
+          "memberId": "m7",
+          "ratio": 13.57
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 15.09
+        },
+        {
+          "memberId": "ma",
+          "ratio": 16.31
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m0"
+    },
+    {
+      "id": "eh",
+      "name": "費目18",
+      "amount": 13627,
+      "payerId": "m5",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m8"
+    },
+    {
+      "id": "ei",
+      "name": "費目19",
+      "amount": 14358,
+      "payerId": "m6",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 8.58
+        },
+        {
+          "memberId": "m2",
+          "ratio": 8.91
+        },
+        {
+          "memberId": "m3",
+          "ratio": 0
+        },
+        {
+          "memberId": "m4",
+          "ratio": 9.51
+        },
+        {
+          "memberId": "m5",
+          "ratio": 10.07
+        },
+        {
+          "memberId": "m6",
+          "ratio": 10.73
+        },
+        {
+          "memberId": "m7",
+          "ratio": 11.47
+        },
+        {
+          "memberId": "m8",
+          "ratio": 12.31
+        },
+        {
+          "memberId": "m9",
+          "ratio": 0
+        },
+        {
+          "memberId": "ma",
+          "ratio": 13.67
+        },
+        {
+          "memberId": "mb",
+          "ratio": 14.75
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m1"
+    },
+    {
+      "id": "ej",
+      "name": "費目20",
+      "amount": 15089,
+      "payerId": "m7",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "ma"
+    },
+    {
+      "id": "ek",
+      "name": "費目21",
+      "amount": 15820,
+      "payerId": "m8",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 10.01
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 10.47
+        },
+        {
+          "memberId": "m3",
+          "ratio": 10.93
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 11.75
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.46
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 13.64
+        },
+        {
+          "memberId": "m9",
+          "ratio": 14.61
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 16.13
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m6"
+    },
+    {
+      "id": "el",
+      "name": "費目22",
+      "amount": 16551,
+      "payerId": "m9",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 0
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 0
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m9"
+    },
+    {
+      "id": "em",
+      "name": "費目23",
+      "amount": 17282,
+      "payerId": "ma",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 10.26
+        },
+        {
+          "memberId": "m1",
+          "ratio": 10.56
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 11.14
+        },
+        {
+          "memberId": "m4",
+          "ratio": 11.68
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.61
+        },
+        {
+          "memberId": "m7",
+          "ratio": 13.39
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 14.66
+        },
+        {
+          "memberId": "ma",
+          "ratio": 15.7
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m9"
+    },
+    {
+      "id": "en",
+      "name": "費目24",
+      "amount": 18013,
+      "payerId": "mb",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m5"
+    },
+    {
+      "id": "eo",
+      "name": "費目25",
+      "amount": 18744,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 8.97
+        },
+        {
+          "memberId": "m1",
+          "ratio": 9.21
+        },
+        {
+          "memberId": "m2",
+          "ratio": 9.53
+        },
+        {
+          "memberId": "m3",
+          "ratio": 0
+        },
+        {
+          "memberId": "m4",
+          "ratio": 10.13
+        },
+        {
+          "memberId": "m5",
+          "ratio": 10.65
+        },
+        {
+          "memberId": "m6",
+          "ratio": 0
+        },
+        {
+          "memberId": "m7",
+          "ratio": 11.53
+        },
+        {
+          "memberId": "m8",
+          "ratio": 12.25
+        },
+        {
+          "memberId": "m9",
+          "ratio": 0
+        },
+        {
+          "memberId": "ma",
+          "ratio": 13.41
+        },
+        {
+          "memberId": "mb",
+          "ratio": 14.32
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m4"
+    },
+    {
+      "id": "ep",
+      "name": "費目26",
+      "amount": 19475,
+      "payerId": "m1",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m7"
+    },
+    {
+      "id": "eq",
+      "name": "費目27",
+      "amount": 20206,
+      "payerId": "m2",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 10.37
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 10.77
+        },
+        {
+          "memberId": "m3",
+          "ratio": 11.16
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 11.86
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.47
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 13.47
+        },
+        {
+          "memberId": "m9",
+          "ratio": 14.3
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 15.6
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m3"
+    },
+    {
+      "id": "er",
+      "name": "費目28",
+      "amount": 20937,
+      "payerId": "m3",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 0
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 0
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m1"
+    },
+    {
+      "id": "es",
+      "name": "費目29",
+      "amount": 21668,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 10.58
+        },
+        {
+          "memberId": "m1",
+          "ratio": 10.83
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 11.34
+        },
+        {
+          "memberId": "m4",
+          "ratio": 11.8
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.59
+        },
+        {
+          "memberId": "m7",
+          "ratio": 13.27
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 14.36
+        },
+        {
+          "memberId": "ma",
+          "ratio": 15.23
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m6"
+    },
+    {
+      "id": "et",
+      "name": "費目30",
+      "amount": 22399,
+      "payerId": "m5",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m2"
+    },
+    {
+      "id": "eu",
+      "name": "費目31",
+      "amount": 23130,
+      "payerId": "m6",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 9.24
+        },
+        {
+          "memberId": "m2",
+          "ratio": 9.48
+        },
+        {
+          "memberId": "m3",
+          "ratio": 0
+        },
+        {
+          "memberId": "m4",
+          "ratio": 9.93
+        },
+        {
+          "memberId": "m5",
+          "ratio": 10.34
+        },
+        {
+          "memberId": "m6",
+          "ratio": 10.83
+        },
+        {
+          "memberId": "m7",
+          "ratio": 11.38
+        },
+        {
+          "memberId": "m8",
+          "ratio": 12
+        },
+        {
+          "memberId": "m9",
+          "ratio": 0
+        },
+        {
+          "memberId": "ma",
+          "ratio": 13
+        },
+        {
+          "memberId": "mb",
+          "ratio": 13.8
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m8"
+    },
+    {
+      "id": "ev",
+      "name": "費目32",
+      "amount": 23861,
+      "payerId": "m7",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m4"
+    },
+    {
+      "id": "ew",
+      "name": "費目33",
+      "amount": 24592,
+      "payerId": "m8",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 10.65
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 10.99
+        },
+        {
+          "memberId": "m3",
+          "ratio": 11.33
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 11.94
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.47
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 13.35
+        },
+        {
+          "memberId": "m9",
+          "ratio": 14.07
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 15.2
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m0"
+    },
+    {
+      "id": "ex",
+      "name": "費目34",
+      "amount": 25323,
+      "payerId": "m9",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 0
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 0
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m5"
+    },
+    {
+      "id": "ey",
+      "name": "費目35",
+      "amount": 26054,
+      "payerId": "ma",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 10.82
+        },
+        {
+          "memberId": "m1",
+          "ratio": 11.04
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 11.48
+        },
+        {
+          "memberId": "m4",
+          "ratio": 11.88
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.58
+        },
+        {
+          "memberId": "m7",
+          "ratio": 13.17
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 14.13
+        },
+        {
+          "memberId": "ma",
+          "ratio": 14.9
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m3"
+    },
+    {
+      "id": "ez",
+      "name": "費目36",
+      "amount": 26785,
+      "payerId": "mb",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "mb"
+    },
+    {
+      "id": "e10",
+      "name": "費目37",
+      "amount": 27516,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 9.47
+        },
+        {
+          "memberId": "m1",
+          "ratio": 9.65
+        },
+        {
+          "memberId": "m2",
+          "ratio": 9.9
+        },
+        {
+          "memberId": "m3",
+          "ratio": 0
+        },
+        {
+          "memberId": "m4",
+          "ratio": 10.36
+        },
+        {
+          "memberId": "m5",
+          "ratio": 10.76
+        },
+        {
+          "memberId": "m6",
+          "ratio": 0
+        },
+        {
+          "memberId": "m7",
+          "ratio": 11.43
+        },
+        {
+          "memberId": "m8",
+          "ratio": 11.99
+        },
+        {
+          "memberId": "m9",
+          "ratio": 0
+        },
+        {
+          "memberId": "ma",
+          "ratio": 12.88
+        },
+        {
+          "memberId": "mb",
+          "ratio": 13.56
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m0"
+    },
+    {
+      "id": "e11",
+      "name": "費目38",
+      "amount": 28247,
+      "payerId": "m1",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 0
+        },
+        {
+          "memberId": "m6",
+          "ratio": 1
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 0
+        },
+        {
+          "memberId": "m9",
+          "ratio": 1
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m1"
+    },
+    {
+      "id": "e12",
+      "name": "費目39",
+      "amount": 28978,
+      "payerId": "m2",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 10.86
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 11.16
+        },
+        {
+          "memberId": "m3",
+          "ratio": 11.46
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        },
+        {
+          "memberId": "m5",
+          "ratio": 12
+        },
+        {
+          "memberId": "m6",
+          "ratio": 12.47
+        },
+        {
+          "memberId": "m7",
+          "ratio": 0
+        },
+        {
+          "memberId": "m8",
+          "ratio": 13.25
+        },
+        {
+          "memberId": "m9",
+          "ratio": 13.89
+        },
+        {
+          "memberId": "ma",
+          "ratio": 0
+        },
+        {
+          "memberId": "mb",
+          "ratio": 14.91
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m9"
+    },
+    {
+      "id": "e13",
+      "name": "費目40",
+      "amount": 29709,
+      "payerId": "m3",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        },
+        {
+          "memberId": "m5",
+          "ratio": 1
+        },
+        {
+          "memberId": "m6",
+          "ratio": 0
+        },
+        {
+          "memberId": "m7",
+          "ratio": 1
+        },
+        {
+          "memberId": "m8",
+          "ratio": 1
+        },
+        {
+          "memberId": "m9",
+          "ratio": 0
+        },
+        {
+          "memberId": "ma",
+          "ratio": 1
+        },
+        {
+          "memberId": "mb",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m8"
+    }
+  ]
+}

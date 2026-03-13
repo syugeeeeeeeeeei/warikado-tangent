@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import type { EventData, Expense, ExpenseRatio, ViewState } from '../types/domain';
+import { createShortSequentialId } from '../utils/id';
 
 interface UseExpenseFormParams {
   eventData: EventData;
@@ -590,7 +591,13 @@ export const useExpenseForm = ({
     }
 
     const newExpense: Expense = {
-      id: isEditing && editingExpenseId ? editingExpenseId : crypto.randomUUID(),
+      id:
+        isEditing && editingExpenseId
+          ? editingExpenseId
+          : createShortSequentialId(
+              'e',
+              eventData.expenses.map((expense) => expense.id),
+            ),
       name: expenseName,
       amount: numAmount,
       payerId,

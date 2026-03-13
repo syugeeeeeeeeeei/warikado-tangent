@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:share-codec": "node tests/shareCodec.test.cjs",
+    "analyze:share-codec": "node tests/shareCodec.analysis.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.577.0",

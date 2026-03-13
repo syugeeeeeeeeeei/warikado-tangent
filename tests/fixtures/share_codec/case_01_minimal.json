@@ -1,0 +1,33 @@
+{
+  "name": "mini",
+  "members": [
+    {
+      "id": "m0",
+      "name": "Aki"
+    },
+    {
+      "id": "m1",
+      "name": "Nao"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "e0",
+      "name": "費目1",
+      "amount": 1200,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 47.46
+        },
+        {
+          "memberId": "m1",
+          "ratio": 52.54
+        }
+      ],
+      "isGradientMode": true,
+      "fractionBearerId": "m0"
+    }
+  ]
+}

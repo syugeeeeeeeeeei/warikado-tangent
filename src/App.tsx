@@ -6,7 +6,9 @@ import { useToast } from './hooks/useToast';
 import { ExpenseManageView } from './views/ExpenseManageView';
 import { HomeView } from './views/HomeView';
 import { MemberManageView } from './views/MemberManageView';
+import { EVENT_NAME_MAX_LENGTH } from './constants/inputLimits';
 import type { EventData, ViewState } from './types/domain';
+import { limitByCodePoints } from './utils/textLimit';
 
 export default function App() {
   // 画面遷移は URL ではなくローカル state で管理し、モバイル向けに軽量な単一画面遷移を実現する。
@@ -15,6 +17,8 @@ export default function App() {
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
   // ホーム画面右下の FAB メニュー開閉状態。
   const [isFabMenuOpen, setIsFabMenuOpen] = useState(false);
+  // 超過入力時トーストの連打を防ぐフラグ。
+  const [eventNameLimitToastShown, setEventNameLimitToastShown] = useState(false);
   // アプリ全体で共有するドメインデータ（イベント名・メンバー・精算項目）。
   const [eventData, setEventData] = useState<EventData>({
     name: '',
@@ -33,6 +37,22 @@ export default function App() {
   // FAB を閉じる処理を共通化して、遷移時やオーバーレイ操作時に同じ挙動を保証する。
   const closeFabMenu = () => setIsFabMenuOpen(false);
 
+  // イベント名は code point 単位で 20 文字までに制限する。
+  const handleEventNameChange = (rawName: string) => {
+    const { value, wasTrimmed } = limitByCodePoints(rawName, EVENT_NAME_MAX_LENGTH);
+    setEventData((prev) => ({ ...prev, name: value }));
+
+    if (wasTrimmed && !eventNameLimitToastShown) {
+      showToast(`イベント名は${EVENT_NAME_MAX_LENGTH}文字までです。`);
+      setEventNameLimitToastShown(true);
+      return;
+    }
+
+    if (!wasTrimmed && eventNameLimitToastShown) {
+      setEventNameLimitToastShown(false);
+    }
+  };
+
   // 画面遷移時に「表示ビュー」「編集対象」「FAB クローズ」を一括で更新する。
   const navigateTo = (view: ViewState, id: string | null = null) => {
     setCurrentView(view);
@@ -45,8 +65,9 @@ export default function App() {
       <AppHeader
         currentView={currentView}
         eventName={eventData.name}
+        eventNameMaxLength={EVENT_NAME_MAX_LENGTH}
         // イベント名のみ差し替え、他の eventData は維持する。
-        onEventNameChange={(name) => setEventData({ ...eventData, name })}
+        onEventNameChange={handleEventNameChange}
         onBackHome={() => navigateTo('home')}
       />
 
