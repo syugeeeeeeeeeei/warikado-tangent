@@ -12,23 +12,78 @@ interface UseExpenseFormParams {
 
 type RatioValue = number | string;
 
-export interface PreviewItem {
-  name: string;
-  owed: number;
-  hasFraction: boolean;
-}
-
-const parseRatioValue = (value: RatioValue | undefined) => {
-  if (typeof value === 'number') return value;
-  return parseInt(String(value ?? ''), 10) || 0;
-};
-
 interface RatioAdjustmentResult {
   ratios: Record<string, RatioValue>;
   zeroRedistributed: boolean;
   totalNormalized: boolean;
   failed: boolean;
 }
+
+export interface PreviewItem {
+  name: string;
+  owed: number;
+  hasFraction: boolean;
+}
+
+const RATIO_DECIMAL_PLACES = 2;
+const RATIO_SCALE = 10 ** RATIO_DECIMAL_PLACES;
+const TOTAL_RATIO_UNITS = 100 * RATIO_SCALE;
+const MIN_ACTIVE_RATIO_UNITS = 1 * RATIO_SCALE;
+
+const toRatioUnits = (value: number) => Math.round(value * RATIO_SCALE);
+
+const fromRatioUnits = (units: number) => {
+  return Number((units / RATIO_SCALE).toFixed(RATIO_DECIMAL_PLACES));
+};
+
+const parseRatioValue = (value: RatioValue | undefined) => {
+  if (typeof value === 'number') return value;
+  return Number.parseFloat(String(value ?? '').trim()) || 0;
+};
+
+const normalizeIntegerPart = (value: string) => {
+  const stripped = value.replace(/^0+(?=\d)/, '');
+  return stripped === '' ? '0' : stripped;
+};
+
+const sanitizeRatioInput = (raw: string) => {
+  const dotted = raw.replace(/,/g, '.');
+  const onlyAllowed = dotted.replace(/[^0-9.]/g, '');
+
+  if (onlyAllowed === '') return '';
+
+  const dotIndex = onlyAllowed.indexOf('.');
+  if (dotIndex === -1) {
+    return normalizeIntegerPart(onlyAllowed);
+  }
+
+  const intPartRaw = onlyAllowed.slice(0, dotIndex);
+  const decimalPart = onlyAllowed
+    .slice(dotIndex + 1)
+    .replace(/\./g, '')
+    .slice(0, RATIO_DECIMAL_PLACES);
+
+  const intPart = intPartRaw === '' ? '0' : normalizeIntegerPart(intPartRaw);
+
+  if (onlyAllowed.endsWith('.') && decimalPart.length === 0) {
+    return `${intPart}.`;
+  }
+
+  if (decimalPart.length === 0) {
+    return intPart;
+  }
+
+  return `${intPart}.${decimalPart}`;
+};
+
+const formatUnitsAsInput = (units: number): string => {
+  const safe = Math.max(0, units);
+  if (safe === 0) return '0';
+
+  const value = fromRatioUnits(safe);
+  const fixed = value.toFixed(RATIO_DECIMAL_PLACES);
+  return fixed.replace(/\.00$/, '').replace(/(\.\d*[1-9])0$/, '$1');
+};
 
 export const useExpenseForm = ({
   eventData,
@@ -98,31 +153,31 @@ export const useExpenseForm = ({
       return { ...currentRatios, [currentActiveIds[0]]: 100 };
     }
 
-    let editedSum = 0;
+    let editedSumUnits = 0;
     const uneditedIds: string[] = [];
 
     currentActiveIds.forEach((id) => {
       if (currentEdited[id]) {
-        editedSum += parseRatioValue(currentRatios[id]);
+        editedSumUnits += toRatioUnits(parseRatioValue(currentRatios[id]));
       } else {
         uneditedIds.push(id);
       }
     });
 
     const newRatios = { ...currentRatios };
-    const remainingRatio = Math.max(0, 100 - editedSum);
+    const remainingUnits = Math.max(0, TOTAL_RATIO_UNITS - editedSumUnits);
 
     if (uneditedIds.length > 0) {
-      const baseShare = Math.floor(remainingRatio / uneditedIds.length);
-      let remainder = remainingRatio % uneditedIds.length;
+      const baseUnits = Math.floor(remainingUnits / uneditedIds.length);
+      let remainder = remainingUnits % uneditedIds.length;
 
       uneditedIds.forEach((id) => {
-        let share = baseShare;
+        let units = baseUnits;
         if (remainder > 0) {
-          share += 1;
+          units += 1;
           remainder -= 1;
         }
-        newRatios[id] = share;
+        newRatios[id] = fromRatioUnits(units);
       });
     }
 
@@ -139,43 +194,51 @@ export const useExpenseForm = ({
 
     const entries = currentActiveIds.map((id) => ({
       id,
-      value: Math.max(0, parseRatioValue(currentRatios[id])),
+      valueUnits: Math.max(0, toRatioUnits(parseRatioValue(currentRatios[id]))),
     }));
 
-    const hasZeroMember = entries.some((entry) => entry.value <= 0);
+    const hasZeroMember = entries.some((entry) => entry.valueUnits <= 0);
     if (!hasZeroMember) {
       return { ratios: currentRatios, redistributed: false };
     }
 
     entries.forEach((entry) => {
-      if (entry.value <= 0) {
-        entry.value = 1;
+      if (entry.valueUnits <= 0) {
+        entry.valueUnits = MIN_ACTIVE_RATIO_UNITS;
       }
     });
 
-    let total = entries.reduce((sum, entry) => sum + entry.value, 0);
-    const targetTotal = 100;
+    let totalUnits = entries.reduce((sum, entry) => sum + entry.valueUnits, 0);
 
-    while (total > targetTotal) {
-      const donors = entries.filter((entry) => entry.value > 1).sort((a, b) => b.value - a.value);
+    while (totalUnits > TOTAL_RATIO_UNITS) {
+      const donors = entries
+        .filter((entry) => entry.valueUnits > MIN_ACTIVE_RATIO_UNITS)
+        .sort((a, b) => b.valueUnits - a.valueUnits);
+
       if (donors.length === 0) break;
 
       for (const donor of donors) {
-        if (total <= targetTotal) break;
-        donor.value -= 1;
-        total -= 1;
+        if (totalUnits <= TOTAL_RATIO_UNITS) break;
+        const reducible = donor.valueUnits - MIN_ACTIVE_RATIO_UNITS;
+        if (reducible <= 0) continue;
+
+        const diff = Math.min(reducible, totalUnits - TOTAL_RATIO_UNITS);
+        donor.valueUnits -= diff;
+        totalUnits -= diff;
       }
     }
 
-    while (total < targetTotal) {
-      const receiver = entries.reduce((max, entry) => (entry.value > max.value ? entry : max), entries[0]);
-      receiver.value += 1;
-      total += 1;
+    while (totalUnits < TOTAL_RATIO_UNITS) {
+      const receiver = entries.reduce((max, entry) =>
+        entry.valueUnits > max.valueUnits ? entry : max,
+      entries[0]);
+      receiver.valueUnits += 1;
+      totalUnits += 1;
     }
 
     const nextRatios = { ...currentRatios };
     entries.forEach((entry) => {
-      nextRatios[entry.id] = entry.value;
+      nextRatios[entry.id] = fromRatioUnits(entry.valueUnits);
     });
 
     return { ratios: nextRatios, redistributed: true };
@@ -190,45 +253,56 @@ export const useExpenseForm = ({
       return { ratios: currentRatios, normalized: false, failed: false };
     }
 
+    if (currentActiveIds.length === 1) {
+      return {
+        ratios: { ...currentRatios, [currentActiveIds[0]]: 100 },
+        normalized: parseRatioValue(currentRatios[currentActiveIds[0]]) !== 100,
+        failed: false,
+      };
+    }
+
     if (currentActiveIds.length > 100) {
       return { ratios: currentRatios, normalized: false, failed: true };
     }
 
     const entries = currentActiveIds.map((id) => ({
       id,
-      value: Math.max(1, parseRatioValue(currentRatios[id])),
+      valueUnits: Math.max(MIN_ACTIVE_RATIO_UNITS, toRatioUnits(parseRatioValue(currentRatios[id]))),
     }));
 
-    const originalTotal = entries.reduce((sum, entry) => sum + entry.value, 0);
-    let total = originalTotal;
-    const targetTotal = 100;
+    const originalTotal = entries.reduce((sum, entry) => sum + entry.valueUnits, 0);
+    let totalUnits = originalTotal;
 
-    if (total < targetTotal) {
+    if (totalUnits < TOTAL_RATIO_UNITS) {
       const receiver =
         entries.find((entry) => entry.id === preferredId) ??
-        entries.reduce((max, entry) => (entry.value > max.value ? entry : max), entries[0]);
-      receiver.value += targetTotal - total;
-      total = targetTotal;
+        entries.reduce((max, entry) =>
+          entry.valueUnits > max.valueUnits ? entry : max,
+        entries[0]);
+      receiver.valueUnits += TOTAL_RATIO_UNITS - totalUnits;
+      totalUnits = TOTAL_RATIO_UNITS;
     }
 
-    if (total > targetTotal) {
-      let excess = total - targetTotal;
+    if (totalUnits > TOTAL_RATIO_UNITS) {
+      let excess = totalUnits - TOTAL_RATIO_UNITS;
       const preferredEntry = preferredId
         ? entries.find((entry) => entry.id === preferredId)
         : undefined;
+
       const donors = [
         ...(preferredEntry ? [preferredEntry] : []),
         ...entries
           .filter((entry) => entry.id !== preferredEntry?.id)
-          .sort((a, b) => b.value - a.value),
+          .sort((a, b) => b.valueUnits - a.valueUnits),
       ];
 
       for (const donor of donors) {
         if (excess <= 0) break;
-        const reducible = donor.value - 1;
+        const reducible = donor.valueUnits - MIN_ACTIVE_RATIO_UNITS;
         if (reducible <= 0) continue;
+
         const diff = Math.min(reducible, excess);
-        donor.value -= diff;
+        donor.valueUnits -= diff;
         excess -= diff;
       }
 
@@ -239,12 +313,12 @@ export const useExpenseForm = ({
 
     const nextRatios = { ...currentRatios };
     entries.forEach((entry) => {
-      nextRatios[entry.id] = entry.value;
+      nextRatios[entry.id] = fromRatioUnits(entry.valueUnits);
     });
 
     return {
       ratios: nextRatios,
-      normalized: originalTotal !== targetTotal,
+      normalized: originalTotal !== TOTAL_RATIO_UNITS,
       failed: false,
     };
   };
@@ -322,9 +396,9 @@ export const useExpenseForm = ({
 
   const handleRatioChange = (memberId: string, value: string) => {
     const activeIds = getActiveIds();
-    const numericStr = value.replace(/[^0-9]/g, '').replace(/^0+/, '');
+    const sanitized = sanitizeRatioInput(value);
 
-    if (numericStr === '') {
+    if (sanitized === '') {
       const newRatios = { ...ratios, [memberId]: '' };
       const newEditedRatios = { ...editedRatios, [memberId]: true };
       setEditedRatios(newEditedRatios);
@@ -337,19 +411,21 @@ export const useExpenseForm = ({
       return;
     }
 
-    let numValue = parseInt(numericStr, 10);
-    let otherEditedSum = 0;
+    const inputUnits = toRatioUnits(parseRatioValue(sanitized));
+    let otherEditedUnits = 0;
 
     activeIds.forEach((id) => {
       if (id !== memberId && editedRatios[id]) {
-        otherEditedSum += parseRatioValue(ratios[id]);
+        otherEditedUnits += toRatioUnits(parseRatioValue(ratios[id]));
       }
     });
 
-    const maxAllowed = 100 - otherEditedSum;
-    if (numValue > maxAllowed) numValue = maxAllowed;
-
-    const newRatios = { ...ratios, [memberId]: numValue };
+    const maxAllowedUnits = Math.max(0, TOTAL_RATIO_UNITS - otherEditedUnits);
+    const nextInput =
+      inputUnits > maxAllowedUnits
+        ? formatUnitsAsInput(maxAllowedUnits)
+        : sanitized;
+    const newRatios = { ...ratios, [memberId]: nextInput };
     const newEditedRatios = { ...editedRatios, [memberId]: true };
 
     setEditedRatios(newEditedRatios);
@@ -399,17 +475,17 @@ export const useExpenseForm = ({
       return;
     }
 
-    const base = Math.floor(100 / activeIds.length);
-    let remainder = 100 % activeIds.length;
+    const baseUnits = Math.floor(TOTAL_RATIO_UNITS / activeIds.length);
+    let remainder = TOTAL_RATIO_UNITS % activeIds.length;
     const nextRatios = { ...ratios };
 
     activeIds.forEach((id) => {
-      let value = base;
+      let units = baseUnits;
       if (remainder > 0) {
-        value += 1;
+        units += 1;
         remainder -= 1;
       }
-      nextRatios[id] = value;
+      nextRatios[id] = fromRatioUnits(units);
     });
 
     setEditedRatios({});
@@ -444,18 +520,18 @@ export const useExpenseForm = ({
       const isTarget = activeTargets[member.id] ?? false;
       if (!isTarget) return { memberId: member.id, ratio: 0 };
 
-      const ratioNum = parseRatioValue(finalizedRatios[member.id]);
-      const ratioVal = isGradientMode ? ratioNum : 1;
+      const ratioNum = fromRatioUnits(toRatioUnits(parseRatioValue(finalizedRatios[member.id])));
+      const ratioVal = isGradientMode ? ratioNum : Math.max(ratioNum, 1);
 
       return { memberId: member.id, ratio: ratioVal };
     });
 
     if (isGradientMode) {
-      const activeTotal = expenseRatios
+      const activeTotalUnits = expenseRatios
         .filter((ratio) => activeIds.includes(ratio.memberId))
-        .reduce((acc, ratio) => acc + ratio.ratio, 0);
+        .reduce((acc, ratio) => acc + toRatioUnits(ratio.ratio), 0);
 
-      if (activeIds.length > 0 && activeTotal !== 100) {
+      if (activeIds.length > 0 && activeTotalUnits !== TOTAL_RATIO_UNITS) {
         alert('負担割合の合計が100%ではないため保存できません。');
         return;
       }

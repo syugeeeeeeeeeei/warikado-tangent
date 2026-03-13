@@ -184,7 +184,7 @@ export const ExpenseManageView = ({
                       <div className="flex items-center gap-1">
                         <input
                           type="text"
-                          inputMode="numeric"
+                          inputMode="decimal"
                           placeholder="0"
                           value={displayValue}
                           onChange={(event) => handleRatioChange(member.id, event.target.value)}

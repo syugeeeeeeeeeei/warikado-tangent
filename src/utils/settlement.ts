@@ -19,13 +19,18 @@ export const calculateExpenseBreakdowns = (data: EventData): ExpenseBreakdown[] 
   const breakdowns: ExpenseBreakdown[] = [];
 
   data.expenses.forEach((expense) => {
-    const totalRatio = expense.ratios.reduce((sum, ratio) => sum + ratio.ratio, 0);
+    const normalizedRatios = expense.ratios.map((ratio) => ({
+      memberId: ratio.memberId,
+      ratio: expense.isGradientMode ? ratio.ratio : ratio.ratio > 0 ? 1 : 0,
+    }));
+
+    const totalRatio = normalizedRatios.reduce((sum, ratio) => sum + ratio.ratio, 0);
     if (totalRatio === 0) return;
 
     let totalBaseOwed = 0;
     const baseOweds = new Map<string, number>();
 
-    expense.ratios.forEach((ratio) => {
+    normalizedRatios.forEach((ratio) => {
       if (ratio.ratio === 0) {
         baseOweds.set(ratio.memberId, 0);
         return;
@@ -40,11 +45,11 @@ export const calculateExpenseBreakdowns = (data: EventData): ExpenseBreakdown[] 
 
     let actualBearerId = expense.fractionBearerId;
     if (!baseOweds.has(actualBearerId) || baseOweds.get(actualBearerId) === 0) {
-      const firstValidRatio = expense.ratios.find((ratio) => ratio.ratio > 0);
+      const firstValidRatio = normalizedRatios.find((ratio) => ratio.ratio > 0);
       actualBearerId = firstValidRatio ? firstValidRatio.memberId : expense.payerId;
     }
 
-    const items = expense.ratios
+    const items = normalizedRatios
       .filter((ratio) => ratio.ratio > 0)
       .map((ratio) => {
         let finalOwed = baseOweds.get(ratio.memberId) ?? 0;
