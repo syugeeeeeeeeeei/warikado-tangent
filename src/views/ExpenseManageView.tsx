@@ -1,4 +1,4 @@
-import { Check, Edit2, Plus, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
+import { Edit2, Plus, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useExpenseForm } from '../hooks/useExpenseForm';
 import type { EventData, ViewState } from '../types/domain';
@@ -130,7 +130,6 @@ export const ExpenseManageView = ({
                         : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'
                     }`}
                   >
-                    {isActive && <Check size={14} />}
                     {member.name}
                   </button>
                 );

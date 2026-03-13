@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Check, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { ExpenseBreakdown, Member, Transfer } from '../../types/domain';
 
@@ -177,7 +177,6 @@ export const SettlementDetails = ({
                           : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'
                       }`}
                     >
-                      {isActive && <Check size={14} />}
                       {member.name}
                     </button>
                   );

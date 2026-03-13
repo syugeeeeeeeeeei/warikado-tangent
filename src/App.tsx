@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppHeader } from './components/layout/AppHeader';
 import { FabMenu } from './components/layout/FabMenu';
 import { Toast } from './components/layout/Toast';
 import { useToast } from './hooks/useToast';
+import { readEventDataFromUrlHash } from './utils/dataIO';
 import { ExpenseManageView } from './views/ExpenseManageView';
 import { HomeView } from './views/HomeView';
 import { MemberManageView } from './views/MemberManageView';
@@ -19,6 +20,37 @@ export default function App() {
   });
 
   const { toastMessage, showToast } = useToast();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadFromHash = async () => {
+      try {
+        const parsed = await readEventDataFromUrlHash(window.location.hash);
+        if (!parsed || !isMounted) return;
+        setEventData(parsed);
+        showToast('共有URLからデータを読み込みました');
+      } catch (error) {
+        console.error(error);
+        if (isMounted) {
+          showToast('共有URLの読み込みに失敗しました');
+        }
+      }
+    };
+
+    loadFromHash();
+
+    const onHashChange = () => {
+      loadFromHash();
+    };
+
+    window.addEventListener('hashchange', onHashChange);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('hashchange', onHashChange);
+    };
+  }, [showToast]);
 
   const getMemberName = (memberId: string) => {
     return eventData.members.find((member) => member.id === memberId)?.name || '不明';
@@ -45,7 +77,6 @@ export default function App() {
         {currentView === 'home' && (
           <HomeView
             eventData={eventData}
-            setEventData={setEventData}
             getMemberName={getMemberName}
             navigateTo={navigateTo}
             showToast={showToast}
