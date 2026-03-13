@@ -8,6 +8,7 @@ interface ExpenseManageViewProps {
   setEventData: Dispatch<SetStateAction<EventData>>;
   editingExpenseId: string | null;
   navigateTo: (view: ViewState, id?: string | null) => void;
+  showToast: (message: string) => void;
 }
 
 export const ExpenseManageView = ({
@@ -15,6 +16,7 @@ export const ExpenseManageView = ({
   setEventData,
   editingExpenseId,
   navigateTo,
+  showToast,
 }: ExpenseManageViewProps) => {
   const {
     isEditing,
@@ -34,6 +36,8 @@ export const ExpenseManageView = ({
     setFractionBearerId,
     handleAmountChange,
     handleRatioChange,
+    handleRatioBlur,
+    equalizeRatios,
     toggleTarget,
     saveExpense,
     removeExpense,
@@ -42,6 +46,7 @@ export const ExpenseManageView = ({
     setEventData,
     editingExpenseId,
     navigateTo,
+    showToast,
   });
 
   if (eventData.members.length === 0) {
@@ -151,6 +156,14 @@ export const ExpenseManageView = ({
 
             {isGradientMode && (
               <div className="grid grid-cols-2 gap-2 mt-3 animate-fade-in">
+                <div className="col-span-2 flex justify-end">
+                  <button
+                    onClick={equalizeRatios}
+                    className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100 hover:bg-indigo-100 transition-colors"
+                  >
+                    均等化
+                  </button>
+                </div>
                 {activeMembers.map((member) => {
                   const isEdited = editedRatios[member.id] ?? false;
                   const displayValue = ratios[member.id] === 0 ? '' : (ratios[member.id] ?? '');
@@ -158,10 +171,15 @@ export const ExpenseManageView = ({
                   return (
                     <div
                       key={member.id}
-                      className={`flex items-center justify-between border p-2 rounded-xl shadow-sm transition-colors ${
+                      className={`relative flex items-center justify-between border p-2 rounded-xl shadow-sm transition-colors ${
                         isEdited ? 'bg-purple-50 border-purple-200' : 'bg-white border-purple-100'
                       }`}
                     >
+                      {isEdited && (
+                        <span className="absolute -top-2 right-2 text-[9px] font-bold text-purple-700 bg-purple-100 border border-purple-200 rounded-full px-2 py-0.5">
+                          変更済み
+                        </span>
+                      )}
                       <span className="text-xs font-bold text-gray-600 truncate mr-2">{member.name}</span>
                       <div className="flex items-center gap-1">
                         <input
@@ -170,6 +188,7 @@ export const ExpenseManageView = ({
                           placeholder="0"
                           value={displayValue}
                           onChange={(event) => handleRatioChange(member.id, event.target.value)}
+                          onBlur={() => handleRatioBlur(member.id)}
                           className={`w-12 text-center font-bold rounded-lg px-1 py-1 focus:outline-none focus:ring-2 focus:ring-purple-300 ${
                             isEdited
                               ? 'bg-white text-purple-700'

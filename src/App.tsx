@@ -63,6 +63,7 @@ export default function App() {
             setEventData={setEventData}
             editingExpenseId={editingExpenseId}
             navigateTo={navigateTo}
+            showToast={showToast}
           />
         )}
       </main>

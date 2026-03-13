@@ -39,4 +39,18 @@ export interface CalculationLog {
   net: number;
 }
 
+export interface ExpenseBreakdownItem {
+  memberId: string;
+  amountOwed: number;
+  formula: string;
+}
+
+export interface ExpenseBreakdown {
+  expenseId: string;
+  expenseName: string;
+  payerId: string;
+  amount: number;
+  items: ExpenseBreakdownItem[];
+}
+
 export type ViewState = 'home' | 'manage_members' | 'manage_expenses';

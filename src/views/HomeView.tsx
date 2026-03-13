@@ -27,7 +27,7 @@ export const HomeView = ({
   const [showDetails, setShowDetails] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { transfers, logs } = useMemo(() => calculateSettlement(eventData), [eventData]);
+  const { transfers, logs, breakdowns } = useMemo(() => calculateSettlement(eventData), [eventData]);
 
   const handleSaveJson = () => {
     saveEventDataAsJson(eventData);
@@ -68,7 +68,9 @@ export const HomeView = ({
       {eventData.expenses.length > 0 && (
         <SettlementDetails
           members={eventData.members}
-          logs={logs}
+          transfers={transfers}
+          breakdowns={breakdowns}
+          getMemberName={getMemberName}
           showDetails={showDetails}
           onToggle={() => setShowDetails((prev) => !prev)}
         />

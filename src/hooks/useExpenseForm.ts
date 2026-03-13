@@ -7,6 +7,7 @@ interface UseExpenseFormParams {
   setEventData: Dispatch<SetStateAction<EventData>>;
   editingExpenseId: string | null;
   navigateTo: (view: ViewState, id?: string | null) => void;
+  showToast: (message: string) => void;
 }
 
 type RatioValue = number | string;
@@ -17,11 +18,17 @@ export interface PreviewItem {
   hasFraction: boolean;
 }
 
+const parseRatioValue = (value: RatioValue | undefined) => {
+  if (typeof value === 'number') return value;
+  return parseInt(String(value ?? ''), 10) || 0;
+};
+
 export const useExpenseForm = ({
   eventData,
   setEventData,
   editingExpenseId,
   navigateTo,
+  showToast,
 }: UseExpenseFormParams) => {
   const isEditing = Boolean(editingExpenseId);
   const editingExpense = isEditing
@@ -64,23 +71,32 @@ export const useExpenseForm = ({
     initialEditedRatios,
   );
 
+  const getActiveIds = () => {
+    return eventData.members
+      .map((member) => member.id)
+      .filter((id) => activeTargets[id]);
+  };
+
   const handleAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
     const normalized = event.target.value.replace(/[^0-9]/g, '').replace(/^0+/, '');
     setAmountStr(normalized);
   };
 
-  const recalculateUneditedRatios = (
+  const calculateUneditedRatios = (
     currentActiveIds: string[],
     currentRatios: Record<string, RatioValue>,
     currentEdited: Record<string, boolean>,
-  ) => {
+  ): Record<string, RatioValue> => {
+    if (currentActiveIds.length === 1) {
+      return { ...currentRatios, [currentActiveIds[0]]: 100 };
+    }
+
     let editedSum = 0;
     const uneditedIds: string[] = [];
 
     currentActiveIds.forEach((id) => {
       if (currentEdited[id]) {
-        const val = currentRatios[id];
-        editedSum += typeof val === 'number' ? val : parseInt(String(val), 10) || 0;
+        editedSum += parseRatioValue(currentRatios[id]);
       } else {
         uneditedIds.push(id);
       }
@@ -103,7 +119,78 @@ export const useExpenseForm = ({
       });
     }
 
-    setRatios(newRatios);
+    return newRatios;
+  };
+
+  const redistributeIfAnyZero = (
+    currentActiveIds: string[],
+    currentRatios: Record<string, RatioValue>,
+  ): { ratios: Record<string, RatioValue>; redistributed: boolean } => {
+    if (currentActiveIds.length <= 1 || currentActiveIds.length > 100) {
+      return { ratios: currentRatios, redistributed: false };
+    }
+
+    const entries = currentActiveIds.map((id) => ({
+      id,
+      value: Math.max(0, parseRatioValue(currentRatios[id])),
+    }));
+
+    const hasZeroMember = entries.some((entry) => entry.value <= 0);
+    if (!hasZeroMember) {
+      return { ratios: currentRatios, redistributed: false };
+    }
+
+    entries.forEach((entry) => {
+      if (entry.value <= 0) {
+        entry.value = 1;
+      }
+    });
+
+    let total = entries.reduce((sum, entry) => sum + entry.value, 0);
+    const targetTotal = 100;
+
+    while (total > targetTotal) {
+      const donors = entries.filter((entry) => entry.value > 1).sort((a, b) => b.value - a.value);
+      if (donors.length === 0) break;
+
+      for (const donor of donors) {
+        if (total <= targetTotal) break;
+        donor.value -= 1;
+        total -= 1;
+      }
+    }
+
+    while (total < targetTotal) {
+      const receiver = entries.reduce((max, entry) => (entry.value > max.value ? entry : max), entries[0]);
+      receiver.value += 1;
+      total += 1;
+    }
+
+    const nextRatios = { ...currentRatios };
+    entries.forEach((entry) => {
+      nextRatios[entry.id] = entry.value;
+    });
+
+    return { ratios: nextRatios, redistributed: true };
+  };
+
+  const applyRatios = (
+    currentActiveIds: string[],
+    nextRatios: Record<string, RatioValue>,
+    withWarning: boolean,
+    avoidZero = true,
+  ) => {
+    if (!avoidZero) {
+      setRatios(nextRatios);
+      return;
+    }
+
+    const redistributed = redistributeIfAnyZero(currentActiveIds, nextRatios);
+    setRatios(redistributed.ratios);
+
+    if (withWarning && redistributed.redistributed) {
+      showToast('負担割合0%のメンバーが出たため自動で再分配しました。');
+    }
   };
 
   const toggleTarget = (memberId: string) => {
@@ -113,7 +200,7 @@ export const useExpenseForm = ({
       const activeIds = Object.keys(nextState).filter((id) => nextState[id]);
 
       setEditedRatios({});
-      recalculateUneditedRatios(activeIds, {}, {});
+      applyRatios(activeIds, calculateUneditedRatios(activeIds, {}, {}), false);
 
       if (!nextState[fractionBearerId] && activeIds.length > 0) {
         setFractionBearerId(activeIds[0]);
@@ -126,17 +213,19 @@ export const useExpenseForm = ({
   };
 
   const handleRatioChange = (memberId: string, value: string) => {
-    const activeIds = eventData.members
-      .map((member) => member.id)
-      .filter((id) => activeTargets[id]);
-
+    const activeIds = getActiveIds();
     const numericStr = value.replace(/[^0-9]/g, '').replace(/^0+/, '');
 
     if (numericStr === '') {
       const newRatios = { ...ratios, [memberId]: '' };
       const newEditedRatios = { ...editedRatios, [memberId]: true };
       setEditedRatios(newEditedRatios);
-      recalculateUneditedRatios(activeIds, newRatios, newEditedRatios);
+      applyRatios(
+        activeIds,
+        calculateUneditedRatios(activeIds, newRatios, newEditedRatios),
+        false,
+        false,
+      );
       return;
     }
 
@@ -145,8 +234,7 @@ export const useExpenseForm = ({
 
     activeIds.forEach((id) => {
       if (id !== memberId && editedRatios[id]) {
-        const val = ratios[id];
-        otherEditedSum += typeof val === 'number' ? val : parseInt(String(val), 10) || 0;
+        otherEditedSum += parseRatioValue(ratios[id]);
       }
     });
 
@@ -157,7 +245,50 @@ export const useExpenseForm = ({
     const newEditedRatios = { ...editedRatios, [memberId]: true };
 
     setEditedRatios(newEditedRatios);
-    recalculateUneditedRatios(activeIds, newRatios, newEditedRatios);
+    applyRatios(activeIds, calculateUneditedRatios(activeIds, newRatios, newEditedRatios), true);
+  };
+
+  const handleRatioBlur = (memberId: string) => {
+    const activeIds = getActiveIds();
+    const currentValue = ratios[memberId];
+    const parsedValue = parseRatioValue(currentValue);
+
+    if (currentValue === '' || parsedValue <= 0) {
+      const newEditedRatios = { ...editedRatios, [memberId]: false };
+      const clearedRatios = { ...ratios, [memberId]: 0 };
+
+      setEditedRatios(newEditedRatios);
+      applyRatios(activeIds, calculateUneditedRatios(activeIds, clearedRatios, newEditedRatios), false);
+      return;
+    }
+
+    applyRatios(activeIds, { ...ratios }, true);
+  };
+
+  const equalizeRatios = () => {
+    const activeIds = getActiveIds();
+    if (activeIds.length === 0) return;
+
+    if (activeIds.length > 100) {
+      showToast('対象メンバーが多いため均等化できません。');
+      return;
+    }
+
+    const base = Math.floor(100 / activeIds.length);
+    let remainder = 100 % activeIds.length;
+    const nextRatios = { ...ratios };
+
+    activeIds.forEach((id) => {
+      let value = base;
+      if (remainder > 0) {
+        value += 1;
+        remainder -= 1;
+      }
+      nextRatios[id] = value;
+    });
+
+    setEditedRatios({});
+    setRatios(nextRatios);
   };
 
   const saveExpense = () => {
@@ -168,9 +299,7 @@ export const useExpenseForm = ({
       const isTarget = activeTargets[member.id] ?? false;
       if (!isTarget) return { memberId: member.id, ratio: 0 };
 
-      const rawRatio = ratios[member.id];
-      const ratioNum =
-        typeof rawRatio === 'number' ? rawRatio : parseInt(String(rawRatio), 10) || 0;
+      const ratioNum = parseRatioValue(ratios[member.id]);
       const ratioVal = isGradientMode ? ratioNum : 1;
 
       return { memberId: member.id, ratio: ratioVal };
@@ -228,9 +357,7 @@ export const useExpenseForm = ({
     const targets = eventData.members
       .filter((member) => activeTargets[member.id])
       .map((member) => {
-        const rawRatio = ratios[member.id];
-        const ratioNum =
-          typeof rawRatio === 'number' ? rawRatio : parseInt(String(rawRatio), 10) || 0;
+        const ratioNum = parseRatioValue(ratios[member.id]);
         const ratio = isGradientMode ? ratioNum : 1;
 
         return {
@@ -299,6 +426,8 @@ export const useExpenseForm = ({
     setFractionBearerId,
     handleAmountChange,
     handleRatioChange,
+    handleRatioBlur,
+    equalizeRatios,
     toggleTarget,
     saveExpense,
     removeExpense,

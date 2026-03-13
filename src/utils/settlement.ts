@@ -1,19 +1,26 @@
-import type { CalculationLog, EventData, Transfer } from '../types/domain';
+import type { CalculationLog, EventData, ExpenseBreakdown, Transfer } from '../types/domain';
 
-export const calculateSettlement = (
-  data: EventData,
-): { transfers: Transfer[]; logs: CalculationLog[] } => {
-  const balances = new Map<string, number>();
-  const logs: CalculationLog[] = [];
+const buildFormula = (
+  amount: number,
+  ratio: number,
+  totalRatio: number,
+  isGradientMode: boolean,
+  hasFraction: boolean,
+  fraction: number,
+) => {
+  if (isGradientMode) {
+    return `${amount}円 × ${ratio}%${hasFraction && fraction > 0 ? ` ＋ 端数${fraction}円` : ''}`;
+  }
 
-  data.members.forEach((member) => balances.set(member.id, 0));
+  return `${amount}円 ÷ 比率合計${totalRatio}${hasFraction && fraction > 0 ? ` ＋ 端数${fraction}円` : ''}`;
+};
+
+export const calculateExpenseBreakdowns = (data: EventData): ExpenseBreakdown[] => {
+  const breakdowns: ExpenseBreakdown[] = [];
 
   data.expenses.forEach((expense) => {
     const totalRatio = expense.ratios.reduce((sum, ratio) => sum + ratio.ratio, 0);
     if (totalRatio === 0) return;
-
-    const currentPayerBalance = balances.get(expense.payerId) ?? 0;
-    balances.set(expense.payerId, currentPayerBalance + expense.amount);
 
     let totalBaseOwed = 0;
     const baseOweds = new Map<string, number>();
@@ -23,6 +30,7 @@ export const calculateSettlement = (
         baseOweds.set(ratio.memberId, 0);
         return;
       }
+
       const baseOwed = Math.floor(expense.amount * (ratio.ratio / totalRatio));
       baseOweds.set(ratio.memberId, baseOwed);
       totalBaseOwed += baseOwed;
@@ -36,32 +44,68 @@ export const calculateSettlement = (
       actualBearerId = firstValidRatio ? firstValidRatio.memberId : expense.payerId;
     }
 
-    expense.ratios.forEach((ratio) => {
-      if (ratio.ratio === 0) return;
+    const items = expense.ratios
+      .filter((ratio) => ratio.ratio > 0)
+      .map((ratio) => {
+        let finalOwed = baseOweds.get(ratio.memberId) ?? 0;
+        let hasFraction = false;
 
-      let finalOwed = baseOweds.get(ratio.memberId) ?? 0;
-      let hasFraction = false;
+        if (ratio.memberId === actualBearerId) {
+          finalOwed += fraction;
+          hasFraction = fraction > 0;
+        }
 
-      if (ratio.memberId === actualBearerId) {
-        finalOwed += fraction;
-        hasFraction = fraction > 0;
-      }
+        return {
+          memberId: ratio.memberId,
+          amountOwed: finalOwed,
+          formula: buildFormula(
+            expense.amount,
+            ratio.ratio,
+            totalRatio,
+            expense.isGradientMode,
+            hasFraction,
+            fraction,
+          ),
+        };
+      });
 
-      const currentBalance = balances.get(ratio.memberId) ?? 0;
-      balances.set(ratio.memberId, currentBalance - finalOwed);
+    breakdowns.push({
+      expenseId: expense.id,
+      expenseName: expense.name,
+      payerId: expense.payerId,
+      amount: expense.amount,
+      items,
+    });
+  });
 
-      const formulaStr = expense.isGradientMode
-        ? `${expense.amount}円 × ${ratio.ratio}%${hasFraction && fraction > 0 ? ` ＋ 端数${fraction}円` : ''}`
-        : `${expense.amount}円 ÷ 比率合計${totalRatio}${hasFraction && fraction > 0 ? ` ＋ 端数${fraction}円` : ''}`;
+  return breakdowns;
+};
 
-      const amountPaid = expense.payerId === ratio.memberId ? expense.amount : 0;
+export const calculateSettlement = (
+  data: EventData,
+): { transfers: Transfer[]; logs: CalculationLog[]; breakdowns: ExpenseBreakdown[] } => {
+  const balances = new Map<string, number>();
+  const logs: CalculationLog[] = [];
+  const breakdowns = calculateExpenseBreakdowns(data);
+
+  data.members.forEach((member) => balances.set(member.id, 0));
+
+  breakdowns.forEach((breakdown) => {
+    const currentPayerBalance = balances.get(breakdown.payerId) ?? 0;
+    balances.set(breakdown.payerId, currentPayerBalance + breakdown.amount);
+
+    breakdown.items.forEach((item) => {
+      const currentBalance = balances.get(item.memberId) ?? 0;
+      balances.set(item.memberId, currentBalance - item.amountOwed);
+
+      const amountPaid = breakdown.payerId === item.memberId ? breakdown.amount : 0;
       logs.push({
-        memberId: ratio.memberId,
-        expenseName: expense.name,
-        formula: formulaStr,
-        amountOwed: finalOwed,
+        memberId: item.memberId,
+        expenseName: breakdown.expenseName,
+        formula: item.formula,
+        amountOwed: item.amountOwed,
         amountPaid,
-        net: amountPaid - finalOwed,
+        net: amountPaid - item.amountOwed,
       });
     });
   });
@@ -102,5 +146,5 @@ export const calculateSettlement = (
     if (creditor.amount < 0.01) creditorIndex += 1;
   }
 
-  return { transfers, logs };
+  return { transfers, logs, breakdowns };
 };
