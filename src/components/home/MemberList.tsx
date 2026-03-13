@@ -21,7 +21,7 @@ export const MemberList = ({ members, onManageMembers }: MemberListProps) => {
           管理する
         </button>
       </div>
-      <div className="bg-white p-4 rounded-3xl shadow-sm border border-emerald-100/50 flex flex-wrap gap-2">
+      <div className="bg-white p-4 rounded-2xl shadow-sm border border-emerald-100/50 flex flex-wrap gap-2">
         {members.length === 0 ? (
           <p className="text-center text-gray-400 text-sm py-4 w-full">登録なし</p>
         ) : (

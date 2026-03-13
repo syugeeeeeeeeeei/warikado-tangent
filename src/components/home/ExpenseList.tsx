@@ -78,7 +78,9 @@ export const ExpenseList = ({
       </div>
       <div>
         {expenses.length === 0 ? (
-          <p className="text-center text-gray-400 text-sm py-8">登録なし</p>
+          <div className="bg-white p-3 rounded-2xl border border-sky-100/70">
+            <p className="text-center text-gray-400 text-sm py-8">登録なし</p>
+          </div>
         ) : (
           <ul className="space-y-2">
             {expenses.map((expense) => {

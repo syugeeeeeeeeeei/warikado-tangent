@@ -19,7 +19,7 @@ export const SettlementSummary = ({
           <PieChart size={20} className="text-orange-500" /> 精算結果
         </h2>
       </div>
-      <div className="bg-white p-5 rounded-3xl shadow-sm border border-orange-100/50">
+      <div className="bg-white p-5 rounded-2xl shadow-sm border border-orange-100/50">
         {expensesCount === 0 ? (
           <p className="text-center text-gray-400 text-sm py-4">
             右下の「＋」から精算項目を追加してください
