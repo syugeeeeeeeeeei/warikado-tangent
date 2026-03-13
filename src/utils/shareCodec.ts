@@ -1,9 +1,23 @@
-import type { EventData } from '../types/domain';
+import type { EventData, Expense, ExpenseRatio, Member } from '../types/domain';
 
 type SupportedCompressionFormat = 'gzip';
 
 const CURRENT_COMPRESSION_FORMAT: SupportedCompressionFormat = 'gzip';
 const ENCODED_PREFIX = 'gz.';
+
+// v1: [version, eventName, memberNames, expenses]
+// expense: [name, amount, payerIndex, gradientMode(0|1), fractionBearerIndex, sparseRatios]
+// sparseRatio: [memberIndex, ratio]
+type ShareRatioTuple = [number, number];
+type ShareExpenseTuple = [
+  string,
+  number,
+  number,
+  0 | 1,
+  number,
+  ShareRatioTuple[],
+];
+type SharePayloadV1 = [1, string, string[], ShareExpenseTuple[]];
 
 const toArrayBuffer = (bytes: Uint8Array) => {
   return bytes.buffer.slice(
@@ -100,59 +114,127 @@ const fromBase64Url = (base64Url: string) => {
   return base64ToBytes(padded);
 };
 
+const toSafeInteger = (value: unknown, fallback = 0) => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
+  return Math.max(0, Math.trunc(value));
+};
+
+const toSharePayloadV1 = (eventData: EventData): SharePayloadV1 => {
+  const members = eventData.members.map((member) => member.name);
+  const memberIdToIndex = new Map(
+    eventData.members.map((member, index) => [member.id, index]),
+  );
+
+  const expenses: ShareExpenseTuple[] = eventData.expenses.map((expense) => {
+    const payerIndex = memberIdToIndex.get(expense.payerId) ?? 0;
+    const fractionBearerIndex =
+      memberIdToIndex.get(expense.fractionBearerId) ?? payerIndex;
+
+    const sparseRatios: ShareRatioTuple[] = expense.ratios
+      .map((ratio) => {
+        const memberIndex = memberIdToIndex.get(ratio.memberId);
+        if (memberIndex === undefined || ratio.ratio <= 0) return null;
+        return [memberIndex, ratio.ratio] as ShareRatioTuple;
+      })
+      .filter((pair): pair is ShareRatioTuple => Boolean(pair))
+      .sort((a, b) => a[0] - b[0]);
+
+    return [
+      expense.name,
+      toSafeInteger(expense.amount),
+      payerIndex,
+      expense.isGradientMode ? 1 : 0,
+      fractionBearerIndex,
+      sparseRatios,
+    ];
+  });
+
+  return [1, eventData.name, members, expenses];
+};
+
+const isValidIndex = (index: number, length: number) => {
+  return Number.isInteger(index) && index >= 0 && index < length;
+};
+
+const fromSharePayloadV1 = (payload: SharePayloadV1): EventData => {
+  const [, name, memberNames, expenseTuples] = payload;
+  const members: Member[] = Array.isArray(memberNames)
+    ? memberNames.map((memberName, index) => ({
+        id: `m${index.toString(36)}`,
+        name: typeof memberName === 'string' ? memberName : '',
+      }))
+    : [];
+
+  const defaultMemberId = members[0]?.id ?? '';
+
+  const expenses: Expense[] = Array.isArray(expenseTuples)
+    ? expenseTuples.map((tuple, expenseIndex) => {
+        const [
+          expenseName,
+          amount,
+          payerIndex,
+          gradientMode,
+          fractionBearerIndex,
+          sparseRatios,
+        ] = tuple;
+
+        const ratioMap = new Map<number, number>();
+        if (Array.isArray(sparseRatios)) {
+          sparseRatios.forEach((pair) => {
+            if (!Array.isArray(pair) || pair.length !== 2) return;
+            const [memberIndex, ratioValue] = pair;
+            if (!isValidIndex(memberIndex, members.length)) return;
+            if (typeof ratioValue !== 'number' || !Number.isFinite(ratioValue)) return;
+            if (ratioValue <= 0) return;
+            ratioMap.set(memberIndex, ratioValue);
+          });
+        }
+
+        const ratios: ExpenseRatio[] = members.map((member, memberIndex) => ({
+          memberId: member.id,
+          ratio: ratioMap.get(memberIndex) ?? 0,
+        }));
+
+        return {
+          id: `e${expenseIndex.toString(36)}`,
+          name: typeof expenseName === 'string' ? expenseName : '',
+          amount: toSafeInteger(amount),
+          payerId: isValidIndex(payerIndex, members.length)
+            ? members[payerIndex].id
+            : defaultMemberId,
+          ratios,
+          isGradientMode: gradientMode === 1,
+          fractionBearerId: isValidIndex(fractionBearerIndex, members.length)
+            ? members[fractionBearerIndex].id
+            : defaultMemberId,
+        };
+      })
+    : [];
+
+  return { name: typeof name === 'string' ? name : '', members, expenses };
+};
+
+const isEventDataLike = (parsed: unknown): parsed is EventData => {
+  if (!parsed || typeof parsed !== 'object') return false;
+  return 'members' in parsed && 'expenses' in parsed;
+};
+
+const isSharePayloadV1 = (parsed: unknown): parsed is SharePayloadV1 => {
+  if (!Array.isArray(parsed)) return false;
+  if (parsed.length !== 4) return false;
+  return parsed[0] === 1;
+};
+
 export interface EncodedEventDataResult {
   encoded: string;
   compression: SupportedCompressionFormat;
 }
 
-const normalizeIdsForShare = (eventData: EventData): EventData => {
-  const memberPairs = eventData.members.map((member, index) => {
-    const compactId = `m${index.toString(36)}`;
-    return {
-      oldId: member.id,
-      id: compactId,
-      name: member.name,
-    };
-  });
-  const memberIdMap = new Map(memberPairs.map((pair) => [pair.oldId, pair.id]));
-  const normalizedMembers = memberPairs.map((pair) => ({
-    id: pair.id,
-    name: pair.name,
-  }));
-
-  const firstMemberId = normalizedMembers[0]?.id ?? '';
-
-  const normalizedExpenses = eventData.expenses.map((expense, index) => {
-    const compactExpenseId = `e${index.toString(36)}`;
-    const ratioMap = new Map(expense.ratios.map((ratio) => [ratio.memberId, ratio.ratio]));
-    const normalizedRatios = memberPairs.map((memberPair) => ({
-      memberId: memberPair.id,
-      ratio: ratioMap.get(memberPair.oldId) ?? 0,
-    }));
-
-    return {
-      id: compactExpenseId,
-      name: expense.name,
-      amount: expense.amount,
-      payerId: memberIdMap.get(expense.payerId) ?? firstMemberId,
-      ratios: normalizedRatios,
-      isGradientMode: expense.isGradientMode,
-      fractionBearerId: memberIdMap.get(expense.fractionBearerId) ?? firstMemberId,
-    };
-  });
-
-  return {
-    name: eventData.name,
-    members: normalizedMembers,
-    expenses: normalizedExpenses,
-  };
-};
-
 // EventData を URL 共有向け文字列に圧縮する。
 export const encodeEventDataToUrlSafe = async (
   eventData: EventData,
 ): Promise<EncodedEventDataResult> => {
-  const compacted = normalizeIdsForShare(eventData);
+  const compacted = toSharePayloadV1(eventData);
   const rawJson = JSON.stringify(compacted);
   const rawBytes = new TextEncoder().encode(rawJson);
   const compressed = await compressBytes(rawBytes, CURRENT_COMPRESSION_FORMAT);
@@ -182,16 +264,16 @@ export const decodeEventDataFromUrlSafe = async (
     CURRENT_COMPRESSION_FORMAT,
   );
   const json = new TextDecoder().decode(decompressed);
-  const parsed = JSON.parse(json);
+  const parsed = JSON.parse(json) as unknown;
 
-  if (
-    !parsed ||
-    typeof parsed !== 'object' ||
-    !('members' in parsed) ||
-    !('expenses' in parsed)
-  ) {
-    throw new Error('Invalid event data format.');
+  // 互換: 旧フォーマット（EventData直接JSON）も読み込めるようにしておく。
+  if (isEventDataLike(parsed)) {
+    return parsed;
   }
 
-  return parsed as EventData;
+  if (isSharePayloadV1(parsed)) {
+    return fromSharePayloadV1(parsed);
+  }
+
+  throw new Error('Invalid event data format.');
 };

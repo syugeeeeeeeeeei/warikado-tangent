@@ -1,0 +1,567 @@
+{
+  "name": "諏訪旅",
+  "members": [
+    {
+      "id": "m0",
+      "name": "澤村"
+    },
+    {
+      "id": "m1",
+      "name": "まつひろ"
+    },
+    {
+      "id": "m2",
+      "name": "塩田"
+    },
+    {
+      "id": "m3",
+      "name": "ともやん"
+    },
+    {
+      "id": "m4",
+      "name": "しょーま"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "e0",
+      "name": "レンタカー",
+      "amount": 37048,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m4"
+    },
+    {
+      "id": "e1",
+      "name": "牛乳パン",
+      "amount": 258,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 0
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m0"
+    },
+    {
+      "id": "e2",
+      "name": "ルーベラ、バニラチーズケーキ、ミルクレープ、パンケーキ",
+      "amount": 892,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m3"
+    },
+    {
+      "id": "e3",
+      "name": "ETC",
+      "amount": 16370,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m4"
+    },
+    {
+      "id": "e4",
+      "name": "スパ銭",
+      "amount": 11400,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m4"
+    },
+    {
+      "id": "e5",
+      "name": "ガソリン",
+      "amount": 4155,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m4"
+    },
+    {
+      "id": "e6",
+      "name": "ライト代",
+      "amount": 6578,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m3"
+    },
+    {
+      "id": "e7",
+      "name": "日本酒",
+      "amount": 1980,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m4"
+    },
+    {
+      "id": "e8",
+      "name": "コンビニ",
+      "amount": 3454,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m4"
+    },
+    {
+      "id": "e9",
+      "name": "燻煙材、ゴミ袋、ブラックキャップ",
+      "amount": 2006,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m3"
+    },
+    {
+      "id": "ea",
+      "name": "ねぎとろ、チャイティー",
+      "amount": 463,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 0
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 0
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m3"
+    },
+    {
+      "id": "eb",
+      "name": "タフグミ",
+      "amount": 257,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m0"
+    },
+    {
+      "id": "ec",
+      "name": "宿代",
+      "amount": 23730,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m0"
+    },
+    {
+      "id": "ed",
+      "name": "入湯税",
+      "amount": 750,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m0"
+    },
+    {
+      "id": "ee",
+      "name": "ブランシール",
+      "amount": 16250,
+      "payerId": "m3",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m3"
+    },
+    {
+      "id": "ef",
+      "name": "唐揚げのやまざき",
+      "amount": 2473,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 0
+        },
+        {
+          "memberId": "m2",
+          "ratio": 0
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m0"
+    },
+    {
+      "id": "eg",
+      "name": "ガソリン代",
+      "amount": 2805,
+      "payerId": "m4",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m4"
+    },
+    {
+      "id": "eh",
+      "name": "舞姫の差し入れ",
+      "amount": 2533,
+      "payerId": "m0",
+      "ratios": [
+        {
+          "memberId": "m0",
+          "ratio": 1
+        },
+        {
+          "memberId": "m1",
+          "ratio": 1
+        },
+        {
+          "memberId": "m2",
+          "ratio": 1
+        },
+        {
+          "memberId": "m3",
+          "ratio": 1
+        },
+        {
+          "memberId": "m4",
+          "ratio": 1
+        }
+      ],
+      "isGradientMode": false,
+      "fractionBearerId": "m0"
+    }
+  ]
+}

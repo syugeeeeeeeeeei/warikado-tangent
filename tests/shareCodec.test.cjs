@@ -11,11 +11,12 @@ const {
 const fixtureDir = path.resolve(__dirname, 'fixtures/share_codec');
 
 const CASE_LENGTH_THRESHOLDS = {
-  case_01_minimal: 350,
-  case_02_small: 700,
-  case_03_medium: 1800,
-  case_04_japanese_boundary: 1500,
-  case_05_large_dense: 3400,
+  case_01_minimal: 200,
+  case_02_small: 400,
+  case_03_medium: 1000,
+  case_04_japanese_boundary: 900,
+  case_05_large_dense: 1800,
+  suwa_testdata: 900,
 };
 
 const URL_SAFE_REGEX = /^gz\.[A-Za-z0-9_-]+$/;

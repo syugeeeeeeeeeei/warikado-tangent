@@ -10,9 +10,10 @@
 ## 2. 圧縮/展開ロジック
 
 - `src/utils/shareCodec.ts` を新設。
-- `EventData -> JSON -> gzip圧縮 -> Base64URL` でエンコード。
+- `EventData -> 固定配列スキーマ(v1) -> JSON -> gzip圧縮 -> Base64URL` でエンコード。
 - `Base64URL -> gunzip -> JSON` でデコード。
 - `gz.` プレフィックスを持たせ、将来フォーマット拡張に備える。
+- 共有スキーマはキー名をほぼ排除し、`ratios` は 0 を持たない疎表現を採用。
 - 共有直前にIDを `m0,m1... / e0,e1...` へ正規化し、UUID混入時もサイズを抑える。
 
 ## 3. ID生成最適化

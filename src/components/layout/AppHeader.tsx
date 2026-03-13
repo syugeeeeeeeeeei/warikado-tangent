@@ -45,7 +45,7 @@ export const AppHeader = ({
                 placeholder="イベント名を入力"
               />
               <span className="text-[10px] text-gray-300 mt-0.5">
-                {Array.from(eventName).length}/{eventNameMaxLength}
+                {Array.from(eventName).length}文字（最大{eventNameMaxLength}文字）
               </span>
             </>
           ) : (
