@@ -5,6 +5,10 @@ on:
     branches: ["main", "master"]
   workflow_dispatch:
 
+# Node.js 20の非推奨警告への対応として、Node.js 24での実行を明示的に有効化する
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: read
   pages: write
@@ -42,9 +46,12 @@ jobs:
       - name: Build
         run: yarn build
         
+      # GitHub Pagesの設定を取得（APIからの自動有効化を試みる）
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        
+        with:
+          enablement: true
+          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
