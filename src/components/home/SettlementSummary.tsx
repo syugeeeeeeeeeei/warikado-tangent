@@ -37,16 +37,20 @@ export const SettlementSummary = ({
             {transfers.map((transfer, index) => (
               <li
                 key={index}
-                className="flex items-center justify-between bg-orange-50/50 p-3 rounded-2xl border border-orange-100"
+                className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center bg-orange-50/50 p-3 rounded-2xl border border-orange-100"
               >
-                <div className="font-bold text-gray-700">{getMemberName(transfer.fromMemberId)}</div>
-                <div className="flex flex-col items-center px-2">
+                <div className="font-bold text-gray-700 truncate pr-2">
+                  {getMemberName(transfer.fromMemberId)}
+                </div>
+                <div className="flex flex-col items-center px-2 justify-self-center">
                   <span className="text-xs font-bold text-orange-600 bg-white px-3 py-1 rounded-full shadow-sm mb-1">
                     ¥{transfer.amount.toLocaleString()}
                   </span>
                   <span className="text-orange-300 text-[10px]">▶︎</span>
                 </div>
-                <div className="font-bold text-gray-700">{getMemberName(transfer.toMemberId)}</div>
+                <div className="font-bold text-gray-700 truncate text-right pl-2">
+                  {getMemberName(transfer.toMemberId)}
+                </div>
               </li>
             ))}
           </ul>

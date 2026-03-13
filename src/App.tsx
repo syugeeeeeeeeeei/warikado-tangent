@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppHeader } from './components/layout/AppHeader';
 import { FabMenu } from './components/layout/FabMenu';
 import { Toast } from './components/layout/Toast';
@@ -8,7 +8,15 @@ import { HomeView } from './views/HomeView';
 import { MemberManageView } from './views/MemberManageView';
 import { EVENT_NAME_MAX_LENGTH } from './constants/inputLimits';
 import type { EventData, ViewState } from './types/domain';
+import { decodeEventDataFromUrlSafe } from './utils/shareCodec';
 import { limitByCodePoints } from './utils/textLimit';
+
+const getSharedPayloadFromHash = (hash: string) => {
+  const normalized = hash.startsWith('#') ? hash.slice(1) : hash;
+  if (!normalized) return null;
+  const params = new URLSearchParams(normalized);
+  return params.get('s');
+};
 
 export default function App() {
   // 画面遷移は URL ではなくローカル state で管理し、モバイル向けに軽量な単一画面遷移を実現する。
@@ -59,6 +67,43 @@ export default function App() {
     setEditingExpenseId(id);
     closeFabMenu();
   };
+
+  // #s=<payload> 付きURLアクセス時に、共有データを自動で復元する。
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadFromSharedUrl = async () => {
+      const payload = getSharedPayloadFromHash(window.location.hash);
+      if (!payload) return;
+
+      try {
+        const parsed = await decodeEventDataFromUrlSafe(payload);
+        if (isCancelled) return;
+
+        setEventData(parsed);
+        setCurrentView('home');
+        setEditingExpenseId(null);
+        setIsFabMenuOpen(false);
+        showToast('共有URLからデータを読み込みました。');
+
+        window.history.replaceState(
+          null,
+          '',
+          `${window.location.pathname}${window.location.search}`,
+        );
+      } catch (error) {
+        console.error(error);
+        if (isCancelled) return;
+        showToast('共有URLの読み込みに失敗しました。');
+      }
+    };
+
+    void loadFromSharedUrl();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [showToast]);
 
   return (
     <div className="min-h-screen bg-orange-50 text-gray-800 font-sans flex flex-col relative selection:bg-orange-200">

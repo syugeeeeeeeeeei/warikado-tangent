@@ -74,6 +74,8 @@ export const SettlementDetails = ({
     return members.map((member) => {
       const payEntries: PayEntry[] = [];
       const receiveEntries: ReceiveEntry[] = [];
+      const payTotalMap = new Map<string, number>();
+      const receiveTotalMap = new Map<string, number>();
       // 最終精算の相手ごと差額（+なら受取、-なら支払）。
       const transferMap = new Map<string, number>();
 
@@ -89,6 +91,8 @@ export const SettlementDetails = ({
             amount: ownItem.amountOwed,
             formula: ownItem.formula,
           });
+          const current = payTotalMap.get(breakdown.payerId) ?? 0;
+          payTotalMap.set(breakdown.payerId, current + ownItem.amountOwed);
         }
 
         // 自分が立替者なら、他メンバー分は「受け取る額」に積む。
@@ -102,6 +106,8 @@ export const SettlementDetails = ({
               fromMemberId: item.memberId,
               amount: item.amountOwed,
             });
+            const current = receiveTotalMap.get(item.memberId) ?? 0;
+            receiveTotalMap.set(item.memberId, current + item.amountOwed);
           });
         }
       });
@@ -125,10 +131,22 @@ export const SettlementDetails = ({
         .map(([counterpartId, amount]) => ({ counterpartId, amount }))
         .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
 
+      const payTotals: TotalResultEntry[] = Array.from(payTotalMap.entries())
+        .filter(([, amount]) => amount > 0)
+        .map(([counterpartId, amount]) => ({ counterpartId, amount }))
+        .sort((a, b) => b.amount - a.amount);
+
+      const receiveTotals: TotalResultEntry[] = Array.from(receiveTotalMap.entries())
+        .filter(([, amount]) => amount > 0)
+        .map(([counterpartId, amount]) => ({ counterpartId, amount }))
+        .sort((a, b) => b.amount - a.amount);
+
       return {
         member,
         payEntries,
         receiveEntries,
+        payTotals,
+        receiveTotals,
         totalResults,
       };
     });
@@ -217,35 +235,52 @@ export const SettlementDetails = ({
                   {detail.payEntries.length === 0 ? (
                     <p className="text-xs text-red-400">支払う項目はありません</p>
                   ) : (
-                    <ul className="space-y-2">
-                      {detail.payEntries.map((entry) => (
-                        <li
-                          key={`${entry.expenseId}-pay-${entry.toMemberId}-${entry.formula}`}
-                          className="bg-white/80 rounded-lg px-2 py-2 border border-red-100"
-                        >
-                          <div className="text-xs text-gray-500 truncate">{entry.expenseName}</div>
-                          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm mt-1">
-                            <span className="font-medium text-gray-700 truncate">
-                              {detail.member.name}
-                            </span>
-                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-red-500">
-                              <ArrowRight size={14} />
-                            </span>
-                            <span className="font-medium text-gray-700 truncate text-right">
-                              {getMemberName(entry.toMemberId)}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="font-bold text-red-500">
-                              ¥{entry.amount.toLocaleString()}
-                            </span>
-                          </div>
-                          <div className="text-[11px] text-gray-400 mt-1 truncate">
-                            式: {entry.formula}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="space-y-3">
+                      <ul className="space-y-2">
+                        {detail.payEntries.map((entry) => (
+                          <li
+                            key={`${entry.expenseId}-pay-${entry.toMemberId}-${entry.formula}`}
+                            className="bg-white/80 rounded-lg px-2 py-2 border border-red-100"
+                          >
+                            <div className="text-xs text-gray-500 truncate">{entry.expenseName}</div>
+                            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm mt-1">
+                              <span className="font-medium text-gray-700 truncate">
+                                {detail.member.name}
+                              </span>
+                              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-red-500">
+                                <ArrowRight size={14} />
+                              </span>
+                              <span className="font-medium text-gray-700 truncate text-right">
+                                {getMemberName(entry.toMemberId)}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-red-500">
+                                ¥{entry.amount.toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-gray-400 mt-1 truncate">
+                              式: {entry.formula}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <div className="border-t border-red-100 pt-2">
+                        <div className="text-[11px] font-bold text-red-700 mb-1">支払いトータル</div>
+                        <ul className="space-y-1.5">
+                          {detail.payTotals.map((entry) => (
+                            <li
+                              key={`pay-total-${detail.member.id}-${entry.counterpartId}`}
+                              className="text-xs text-red-700 flex items-center justify-between"
+                            >
+                              <span className="truncate">{getMemberName(entry.counterpartId)} へ</span>
+                              <span className="font-bold">¥{entry.amount.toLocaleString()}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   )}
                 </article>
 
@@ -254,32 +289,49 @@ export const SettlementDetails = ({
                   {detail.receiveEntries.length === 0 ? (
                     <p className="text-xs text-emerald-400">受け取る項目はありません</p>
                   ) : (
-                    <ul className="space-y-2">
-                      {detail.receiveEntries.map((entry) => (
-                        <li
-                          key={`${entry.expenseId}-receive-${entry.fromMemberId}`}
-                          className="bg-white/80 rounded-lg px-2 py-2 border border-emerald-100"
-                        >
-                          <div className="text-xs text-gray-500 truncate">{entry.expenseName}</div>
-                          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm mt-1">
-                            <span className="font-medium text-gray-700 truncate">
-                              {getMemberName(entry.fromMemberId)}
-                            </span>
-                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                              <ArrowRight size={14} />
-                            </span>
-                            <span className="font-medium text-gray-700 truncate text-right">
-                              {detail.member.name}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="font-bold text-emerald-600">
-                              ¥{entry.amount.toLocaleString()}
-                            </span>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="space-y-3">
+                      <ul className="space-y-2">
+                        {detail.receiveEntries.map((entry) => (
+                          <li
+                            key={`${entry.expenseId}-receive-${entry.fromMemberId}`}
+                            className="bg-white/80 rounded-lg px-2 py-2 border border-emerald-100"
+                          >
+                            <div className="text-xs text-gray-500 truncate">{entry.expenseName}</div>
+                            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm mt-1">
+                              <span className="font-medium text-gray-700 truncate">
+                                {getMemberName(entry.fromMemberId)}
+                              </span>
+                              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                                <ArrowRight size={14} />
+                              </span>
+                              <span className="font-medium text-gray-700 truncate text-right">
+                                {detail.member.name}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-emerald-600">
+                                ¥{entry.amount.toLocaleString()}
+                              </span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <div className="border-t border-emerald-100 pt-2">
+                        <div className="text-[11px] font-bold text-emerald-700 mb-1">受け取りトータル</div>
+                        <ul className="space-y-1.5">
+                          {detail.receiveTotals.map((entry) => (
+                            <li
+                              key={`receive-total-${detail.member.id}-${entry.counterpartId}`}
+                              className="text-xs text-emerald-700 flex items-center justify-between"
+                            >
+                              <span className="truncate">{getMemberName(entry.counterpartId)} から</span>
+                              <span className="font-bold">¥{entry.amount.toLocaleString()}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   )}
                 </article>
 
