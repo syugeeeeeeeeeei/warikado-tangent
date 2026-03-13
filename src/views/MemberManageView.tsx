@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from 'lucide-react';
+import { Check, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { EventData, Member } from '../types/domain';
@@ -6,20 +6,41 @@ import type { EventData, Member } from '../types/domain';
 interface MemberManageViewProps {
   eventData: EventData;
   setEventData: Dispatch<SetStateAction<EventData>>;
+  showToast: (message: string) => void;
 }
 
 export const MemberManageView = ({
   eventData,
   setEventData,
+  showToast,
 }: MemberManageViewProps) => {
   const [newMemberName, setNewMemberName] = useState('');
+  const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
+
+  const normalizeName = (name: string) => name.trim().toLocaleLowerCase();
+
+  const isDuplicateName = (name: string, excludeMemberId?: string) => {
+    const target = normalizeName(name);
+    return eventData.members.some(
+      (member) =>
+        member.id !== excludeMemberId &&
+        normalizeName(member.name) === target,
+    );
+  };
 
   const addMember = () => {
-    if (!newMemberName.trim()) return;
+    const nextName = newMemberName.trim();
+    if (!nextName) return;
+
+    if (isDuplicateName(nextName)) {
+      showToast('そのメンバーはすでに存在します。');
+      return;
+    }
 
     const newMember: Member = {
       id: crypto.randomUUID(),
-      name: newMemberName.trim(),
+      name: nextName,
     };
 
     setEventData({
@@ -38,6 +59,35 @@ export const MemberManageView = ({
         ratios: expense.ratios.filter((ratio) => ratio.memberId !== memberId),
       })),
     });
+  };
+
+  const startEditingMember = (member: Member) => {
+    setEditingMemberId(member.id);
+    setEditingName(member.name);
+  };
+
+  const cancelEditingMember = () => {
+    setEditingMemberId(null);
+    setEditingName('');
+  };
+
+  const saveMemberName = (memberId: string) => {
+    const nextName = editingName.trim();
+    if (!nextName) return;
+
+    if (isDuplicateName(nextName, memberId)) {
+      showToast('そのメンバーはすでに存在します。');
+      return;
+    }
+
+    setEventData({
+      ...eventData,
+      members: eventData.members.map((member) =>
+        member.id === memberId ? { ...member, name: nextName } : member,
+      ),
+    });
+
+    cancelEditingMember();
   };
 
   return (
@@ -68,13 +118,53 @@ export const MemberManageView = ({
             key={member.id}
             className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center"
           >
-            <span className="font-bold text-gray-700">{member.name}</span>
-            <button
-              onClick={() => removeMember(member.id)}
-              className="text-gray-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors"
-            >
-              <Trash2 size={18} />
-            </button>
+            {editingMemberId === member.id ? (
+              <div className="w-full flex items-center gap-2">
+                <input
+                  type="text"
+                  value={editingName}
+                  onChange={(event) => setEditingName(event.target.value)}
+                  onKeyDown={(event) => event.key === 'Enter' && saveMemberName(member.id)}
+                  placeholder="名前を入力"
+                  className="flex-1 bg-gray-50 border border-emerald-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-200 text-gray-700 font-medium"
+                />
+                <button
+                  onClick={() => saveMemberName(member.id)}
+                  disabled={!editingName.trim()}
+                  className="text-emerald-600 bg-emerald-50 border border-emerald-100 p-2 rounded-xl hover:bg-emerald-100 disabled:opacity-40 transition-colors"
+                  aria-label="名前変更を保存"
+                >
+                  <Check size={16} />
+                </button>
+                <button
+                  onClick={cancelEditingMember}
+                  className="text-gray-500 bg-gray-50 border border-gray-200 p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                  aria-label="名前変更をキャンセル"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <>
+                <span className="font-bold text-gray-700">{member.name}</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => startEditingMember(member)}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1.5 rounded-xl hover:bg-emerald-100 transition-colors"
+                  >
+                    <Pencil size={13} />
+                    名前変更
+                  </button>
+                  <button
+                    onClick={() => removeMember(member.id)}
+                    className="text-gray-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors"
+                    aria-label="メンバーを削除"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </>
+            )}
           </li>
         ))}
         {eventData.members.length === 0 && (

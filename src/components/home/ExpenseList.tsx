@@ -1,16 +1,18 @@
-import { Edit2, Receipt } from 'lucide-react';
+import { Edit2, PlusCircle, Receipt } from 'lucide-react';
 import type { Expense } from '../../types/domain';
 
 interface ExpenseListProps {
   expenses: Expense[];
   getMemberName: (id: string) => string;
   onEditExpense: (expenseId: string) => void;
+  onAddExpense: () => void;
 }
 
 export const ExpenseList = ({
   expenses,
   getMemberName,
   onEditExpense,
+  onAddExpense,
 }: ExpenseListProps) => {
   return (
     <section>
@@ -18,7 +20,13 @@ export const ExpenseList = ({
         <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
           <Receipt size={20} className="text-sky-500" /> 精算項目
         </h2>
-        <span className="text-xs text-gray-400">タップして編集</span>
+        <button
+          onClick={onAddExpense}
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 bg-white border border-sky-300 shadow-sm px-3.5 py-1.5 rounded-full hover:bg-sky-50 hover:shadow active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-sky-200"
+        >
+          <PlusCircle size={13} />
+          登録する
+        </button>
       </div>
       <div className="bg-white rounded-3xl shadow-sm border border-sky-100/50 overflow-hidden">
         {expenses.length === 0 ? (

@@ -53,7 +53,11 @@ export default function App() {
         )}
 
         {currentView === 'manage_members' && (
-          <MemberManageView eventData={eventData} setEventData={setEventData} />
+          <MemberManageView
+            eventData={eventData}
+            setEventData={setEventData}
+            showToast={showToast}
+          />
         )}
 
         {currentView === 'manage_expenses' && (

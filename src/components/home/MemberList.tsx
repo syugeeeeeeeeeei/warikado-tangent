@@ -1,4 +1,4 @@
-import { Users } from 'lucide-react';
+import { Settings2, Users } from 'lucide-react';
 import type { Member } from '../../types/domain';
 
 interface MemberListProps {
@@ -15,9 +15,10 @@ export const MemberList = ({ members, onManageMembers }: MemberListProps) => {
         </h2>
         <button
           onClick={onManageMembers}
-          className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-white border border-emerald-300 shadow-sm px-3.5 py-1.5 rounded-full hover:bg-emerald-50 hover:shadow active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-200"
         >
-          管理
+          <Settings2 size={13} />
+          管理する
         </button>
       </div>
       <div className="bg-white p-4 rounded-3xl shadow-sm border border-emerald-100/50 flex flex-wrap gap-2">

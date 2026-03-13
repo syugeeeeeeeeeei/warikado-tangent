@@ -23,6 +23,13 @@ const parseRatioValue = (value: RatioValue | undefined) => {
   return parseInt(String(value ?? ''), 10) || 0;
 };
 
+interface RatioAdjustmentResult {
+  ratios: Record<string, RatioValue>;
+  zeroRedistributed: boolean;
+  totalNormalized: boolean;
+  failed: boolean;
+}
+
 export const useExpenseForm = ({
   eventData,
   setEventData,
@@ -174,22 +181,123 @@ export const useExpenseForm = ({
     return { ratios: nextRatios, redistributed: true };
   };
 
+  const normalizeTotalToHundred = (
+    currentActiveIds: string[],
+    currentRatios: Record<string, RatioValue>,
+    preferredId?: string,
+  ): { ratios: Record<string, RatioValue>; normalized: boolean; failed: boolean } => {
+    if (currentActiveIds.length === 0) {
+      return { ratios: currentRatios, normalized: false, failed: false };
+    }
+
+    if (currentActiveIds.length > 100) {
+      return { ratios: currentRatios, normalized: false, failed: true };
+    }
+
+    const entries = currentActiveIds.map((id) => ({
+      id,
+      value: Math.max(1, parseRatioValue(currentRatios[id])),
+    }));
+
+    const originalTotal = entries.reduce((sum, entry) => sum + entry.value, 0);
+    let total = originalTotal;
+    const targetTotal = 100;
+
+    if (total < targetTotal) {
+      const receiver =
+        entries.find((entry) => entry.id === preferredId) ??
+        entries.reduce((max, entry) => (entry.value > max.value ? entry : max), entries[0]);
+      receiver.value += targetTotal - total;
+      total = targetTotal;
+    }
+
+    if (total > targetTotal) {
+      let excess = total - targetTotal;
+      const preferredEntry = preferredId
+        ? entries.find((entry) => entry.id === preferredId)
+        : undefined;
+      const donors = [
+        ...(preferredEntry ? [preferredEntry] : []),
+        ...entries
+          .filter((entry) => entry.id !== preferredEntry?.id)
+          .sort((a, b) => b.value - a.value),
+      ];
+
+      for (const donor of donors) {
+        if (excess <= 0) break;
+        const reducible = donor.value - 1;
+        if (reducible <= 0) continue;
+        const diff = Math.min(reducible, excess);
+        donor.value -= diff;
+        excess -= diff;
+      }
+
+      if (excess > 0) {
+        return { ratios: currentRatios, normalized: false, failed: true };
+      }
+    }
+
+    const nextRatios = { ...currentRatios };
+    entries.forEach((entry) => {
+      nextRatios[entry.id] = entry.value;
+    });
+
+    return {
+      ratios: nextRatios,
+      normalized: originalTotal !== targetTotal,
+      failed: false,
+    };
+  };
+
+  const adjustRatios = (
+    currentActiveIds: string[],
+    sourceRatios: Record<string, RatioValue>,
+    preferredId?: string,
+  ): RatioAdjustmentResult => {
+    const zeroAdjusted = redistributeIfAnyZero(currentActiveIds, sourceRatios);
+    const totalAdjusted = normalizeTotalToHundred(
+      currentActiveIds,
+      zeroAdjusted.ratios,
+      preferredId,
+    );
+
+    return {
+      ratios: totalAdjusted.ratios,
+      zeroRedistributed: zeroAdjusted.redistributed,
+      totalNormalized: totalAdjusted.normalized,
+      failed: totalAdjusted.failed,
+    };
+  };
+
   const applyRatios = (
     currentActiveIds: string[],
     nextRatios: Record<string, RatioValue>,
     withWarning: boolean,
     avoidZero = true,
+    preferredId?: string,
   ) => {
     if (!avoidZero) {
       setRatios(nextRatios);
       return;
     }
 
-    const redistributed = redistributeIfAnyZero(currentActiveIds, nextRatios);
-    setRatios(redistributed.ratios);
+    const adjusted = adjustRatios(currentActiveIds, nextRatios, preferredId);
+    setRatios(adjusted.ratios);
 
-    if (withWarning && redistributed.redistributed) {
+    if (!withWarning) return;
+
+    if (adjusted.zeroRedistributed && adjusted.totalNormalized) {
+      showToast('負担割合0%のメンバーが出たため、合計100%になるよう自動で再分配しました。');
+      return;
+    }
+
+    if (adjusted.zeroRedistributed) {
       showToast('負担割合0%のメンバーが出たため自動で再分配しました。');
+      return;
+    }
+
+    if (adjusted.totalNormalized) {
+      showToast('負担割合の合計が100%でなかったため自動で補正しました。');
     }
   };
 
@@ -245,7 +353,12 @@ export const useExpenseForm = ({
     const newEditedRatios = { ...editedRatios, [memberId]: true };
 
     setEditedRatios(newEditedRatios);
-    applyRatios(activeIds, calculateUneditedRatios(activeIds, newRatios, newEditedRatios), true);
+    applyRatios(
+      activeIds,
+      calculateUneditedRatios(activeIds, newRatios, newEditedRatios),
+      false,
+      false,
+    );
   };
 
   const handleRatioBlur = (memberId: string) => {
@@ -258,11 +371,23 @@ export const useExpenseForm = ({
       const clearedRatios = { ...ratios, [memberId]: 0 };
 
       setEditedRatios(newEditedRatios);
-      applyRatios(activeIds, calculateUneditedRatios(activeIds, clearedRatios, newEditedRatios), false);
+      applyRatios(
+        activeIds,
+        calculateUneditedRatios(activeIds, clearedRatios, newEditedRatios),
+        true,
+        true,
+        memberId,
+      );
       return;
     }
 
-    applyRatios(activeIds, { ...ratios }, true);
+    applyRatios(
+      activeIds,
+      calculateUneditedRatios(activeIds, { ...ratios }, { ...editedRatios }),
+      true,
+      true,
+      memberId,
+    );
   };
 
   const equalizeRatios = () => {
@@ -294,16 +419,47 @@ export const useExpenseForm = ({
   const saveExpense = () => {
     const numAmount = parseInt(amountStr, 10);
     if (!expenseName || Number.isNaN(numAmount) || numAmount <= 0 || !payerId) return;
+    const activeIds = getActiveIds();
+
+    const recalculated = calculateUneditedRatios(activeIds, { ...ratios }, { ...editedRatios });
+    const adjusted = adjustRatios(activeIds, recalculated, activeIds[0]);
+    const finalizedRatios = adjusted.ratios;
+
+    setRatios(finalizedRatios);
+
+    if (adjusted.zeroRedistributed && adjusted.totalNormalized) {
+      showToast('負担割合0%のメンバーが出たため、合計100%になるよう自動で再分配しました。');
+    } else if (adjusted.zeroRedistributed) {
+      showToast('負担割合0%のメンバーが出たため自動で再分配しました。');
+    } else if (adjusted.totalNormalized) {
+      showToast('負担割合の合計が100%でなかったため自動で補正しました。');
+    }
+
+    if (adjusted.failed) {
+      alert('負担割合を100%に補正できませんでした。入力内容を見直してください。');
+      return;
+    }
 
     const expenseRatios: ExpenseRatio[] = eventData.members.map((member) => {
       const isTarget = activeTargets[member.id] ?? false;
       if (!isTarget) return { memberId: member.id, ratio: 0 };
 
-      const ratioNum = parseRatioValue(ratios[member.id]);
+      const ratioNum = parseRatioValue(finalizedRatios[member.id]);
       const ratioVal = isGradientMode ? ratioNum : 1;
 
       return { memberId: member.id, ratio: ratioVal };
     });
+
+    if (isGradientMode) {
+      const activeTotal = expenseRatios
+        .filter((ratio) => activeIds.includes(ratio.memberId))
+        .reduce((acc, ratio) => acc + ratio.ratio, 0);
+
+      if (activeIds.length > 0 && activeTotal !== 100) {
+        alert('負担割合の合計が100%ではないため保存できません。');
+        return;
+      }
+    }
 
     if (expenseRatios.reduce((acc, ratio) => acc + ratio.ratio, 0) === 0) {
       alert('負担対象者がいない、または勾配の合計が0です。');

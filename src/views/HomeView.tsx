@@ -80,6 +80,7 @@ export const HomeView = ({
         expenses={eventData.expenses}
         getMemberName={getMemberName}
         onEditExpense={(expenseId) => navigateTo('manage_expenses', expenseId)}
+        onAddExpense={() => navigateTo('manage_expenses', null)}
       />
 
       <MemberList
