@@ -10,9 +10,9 @@ interface ExpenseListProps {
 }
 
 const TARGET_MEMBER_LAYOUT = {
-  pageSize: 6,
-  maxColumns: 6,
-  minColumnWidthRem: 2,
+  pageSize: 5,
+  maxColumns: 5,
+  minColumnWidthRem: 1.5,
 } as const;
 
 const getTargetGridStyle = (memberCount: number) => {
@@ -22,7 +22,8 @@ const getTargetGridStyle = (memberCount: number) => {
   );
 
   return {
-    gridTemplateColumns: `repeat(${columnCount}, minmax(${TARGET_MEMBER_LAYOUT.minColumnWidthRem}rem, 1fr))`,
+    gridTemplateColumns: `repeat(${columnCount}, ${TARGET_MEMBER_LAYOUT.minColumnWidthRem}rem)`,
+    justifyContent: 'start',
   };
 };
 
@@ -75,11 +76,11 @@ export const ExpenseList = ({
           登録する
         </button>
       </div>
-      <div className="bg-white rounded-3xl shadow-sm border border-sky-100/50 overflow-hidden">
+      <div>
         {expenses.length === 0 ? (
           <p className="text-center text-gray-400 text-sm py-8">登録なし</p>
         ) : (
-          <ul className="divide-y divide-gray-50">
+          <ul className="space-y-2">
             {expenses.map((expense) => {
               const targetIds = expense.ratios
                 .filter((ratio) => ratio.ratio > 0)
@@ -108,13 +109,15 @@ export const ExpenseList = ({
                 <li
                   key={expense.id}
                   onClick={() => onEditExpense(expense.id)}
-                  className="p-3 hover:bg-sky-50 transition-colors cursor-pointer group"
+                  className="bg-white p-3 rounded-2xl border border-sky-100/70 hover:bg-sky-50 transition-colors cursor-pointer group"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="font-bold text-gray-700 truncate">{expense.name}</div>
-                      <div className="text-[10px] text-gray-400 mt-0.5">
+                      <div className="text-[10px] text-gray-400 mt-0.5 truncate">
                         立替: {getMemberName(expense.payerId)}
+                        <span className="mx-1">・</span>
+                        端数: {getMemberName(expense.fractionBearerId)}
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-0.5 shrink-0">
@@ -133,49 +136,33 @@ export const ExpenseList = ({
                     </div>
                   </div>
 
-                  <div className="mt-2">
-                    <div
-                      className="grid gap-x-1 gap-y-1"
-                      style={getTargetGridStyle(visibleTargetIds.length)}
-                    >
-                      {visibleTargetIds.map((memberId) => {
-                        const memberName = getMemberName(memberId);
-                        const isPayer = memberId === expense.payerId;
-                        const isFractionBearer = memberId === expense.fractionBearerId;
+                  <div className="flex items-start gap-2">
+                    <div>
+                      <div className="text-[10px] text-gray-400">対象メンバー</div>
+                      <div
+                        className="grid gap-x-1 gap-y-1 w-fit"
+                        style={getTargetGridStyle(visibleTargetIds.length)}
+                      >
+                        {visibleTargetIds.map((memberId) => {
+                          const memberName = getMemberName(memberId);
 
-                        return (
-                          <div
-                            key={`${expense.id}-${memberId}`}
-                            className="w-full flex items-center justify-center"
-                            title={memberName}
-                          >
-                            <div className="relative">
+                          return (
+                            <div
+                              key={`${expense.id}-${memberId}`}
+                              className="flex items-center justify-center"
+                              title={memberName}
+                            >
                               <div className="w-6 h-6 rounded-full bg-sky-50 border border-sky-200 text-sky-700 font-extrabold text-[9px] flex items-center justify-center">
                                 {getNameInitial(memberName)}
                               </div>
-
-                              {(isPayer || isFractionBearer) && (
-                                <div className="absolute -top-1 left-1/2 -translate-y-1/2 translate-x-[15%] flex items-center gap-0.5 pointer-events-none z-10">
-                                  {isPayer && (
-                                    <span className="text-[6px] leading-none font-bold text-orange-700 bg-orange-100 border border-orange-200 rounded-full px-1 py-0.5 whitespace-nowrap">
-                                      た
-                                    </span>
-                                  )}
-                                  {isFractionBearer && (
-                                    <span className="text-[6px] leading-none font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 rounded-full px-1 py-0.5 whitespace-nowrap">
-                                      は
-                                    </span>
-                                  )}
-                                </div>
-                              )}
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
 
                     {(hasMoreMembers || canCollapse) && (
-                      <div className="mt-1.5 flex justify-start">
+                      <div className="ml-auto mt-[14px] flex items-center">
                         {hasMoreMembers ? (
                           <button
                             onClick={(event) => {

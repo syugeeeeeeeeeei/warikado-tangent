@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Check, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { ExpenseBreakdown, Member, Transfer } from '../../types/domain';
 
@@ -171,13 +171,11 @@ export const SettlementDetails = ({
                     <button
                       key={member.id}
                       onClick={() => toggleMemberSelection(member.id)}
-                      className={`px-4 py-2 rounded-full text-sm font-bold border transition-all flex items-center gap-1 ${
-                        isActive
+                      className={`px-4 py-2 rounded-full text-sm font-bold border transition-all flex items-center gap-1 ${isActive
                           ? 'bg-sky-500 border-sky-500 text-white shadow-md shadow-sky-200'
                           : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'
-                      }`}
+                        }`}
                     >
-                      {isActive && <Check size={14} />}
                       {member.name}
                     </button>
                   );
@@ -289,11 +287,10 @@ export const SettlementDetails = ({
                             <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm font-bold">
                               <span className="text-gray-700 truncate">{detail.member.name}</span>
                               <span
-                                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 border ${
-                                  isReceive
+                                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 border ${isReceive
                                     ? 'text-emerald-700 border-emerald-200 bg-emerald-50'
                                     : 'text-red-600 border-red-200 bg-red-50'
-                                }`}
+                                  }`}
                               >
                                 {isReceive ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}
                                 <span className="text-[11px] tracking-wide">

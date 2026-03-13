@@ -1,4 +1,4 @@
-import { Check, Edit2, Plus, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
+import { Edit2, Plus, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useExpenseForm } from '../hooks/useExpenseForm';
 import type { EventData, ViewState } from '../types/domain';
@@ -124,13 +124,11 @@ export const ExpenseManageView = ({
                   <button
                     key={member.id}
                     onClick={() => toggleTarget(member.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-bold border transition-all flex items-center gap-1 ${
-                      isActive
+                    className={`px-4 py-2 rounded-full text-sm font-bold border transition-all flex items-center gap-1 ${isActive
                         ? 'bg-sky-500 border-sky-500 text-white shadow-md shadow-sky-200'
                         : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
-                    {isActive && <Check size={14} />}
                     {member.name}
                   </button>
                 );
@@ -171,9 +169,8 @@ export const ExpenseManageView = ({
                   return (
                     <div
                       key={member.id}
-                      className={`relative flex items-center justify-between border p-2 rounded-xl shadow-sm transition-colors ${
-                        isEdited ? 'bg-purple-50 border-purple-200' : 'bg-white border-purple-100'
-                      }`}
+                      className={`relative flex items-center justify-between border p-2 rounded-xl shadow-sm transition-colors ${isEdited ? 'bg-purple-50 border-purple-200' : 'bg-white border-purple-100'
+                        }`}
                     >
                       {isEdited && (
                         <span className="absolute -top-2 right-2 text-[9px] font-bold text-purple-700 bg-purple-100 border border-purple-200 rounded-full px-2 py-0.5">
@@ -189,11 +186,10 @@ export const ExpenseManageView = ({
                           value={displayValue}
                           onChange={(event) => handleRatioChange(member.id, event.target.value)}
                           onBlur={() => handleRatioBlur(member.id)}
-                          className={`w-12 text-center font-bold rounded-lg px-1 py-1 focus:outline-none focus:ring-2 focus:ring-purple-300 ${
-                            isEdited
+                          className={`w-12 text-center font-bold rounded-lg px-1 py-1 focus:outline-none focus:ring-2 focus:ring-purple-300 ${isEdited
                               ? 'bg-white text-purple-700'
                               : 'bg-gray-50 text-gray-500 placeholder-gray-400'
-                          }`}
+                            }`}
                         />
                         <span className="text-[10px] font-bold text-gray-400">%</span>
                       </div>
