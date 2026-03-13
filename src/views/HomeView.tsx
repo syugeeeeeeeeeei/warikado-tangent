@@ -24,16 +24,21 @@ export const HomeView = ({
   navigateTo,
   showToast,
 }: HomeViewProps) => {
+  // 精算詳細パネルの開閉状態。
   const [showDetails, setShowDetails] = useState(false);
+  // JSON 読み込み input を外部からリセットするための参照。
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // eventData が変わるたびに精算結果を再計算する。
   const { transfers, logs, breakdowns } = useMemo(() => calculateSettlement(eventData), [eventData]);
 
+  // 現在データを JSON ダウンロード。
   const handleSaveJson = () => {
     saveEventDataAsJson(eventData);
     showToast('イベントデータを保存しました');
   };
 
+  // JSON ファイル読込。成功時は eventData 全体を置き換える。
   const handleLoadJson = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -46,12 +51,14 @@ export const HomeView = ({
       console.error(error);
       showToast('ファイルの読み込みに失敗しました');
     } finally {
+      // 同じファイルを再選択した場合にも onChange が発火するように value を戻す。
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     }
   };
 
+  // 計算ログを CSV 出力。
   const handleExportCsv = () => {
     exportLogsAsCsv(logs, getMemberName, eventData.name);
     showToast('明細をCSVで出力しました');
@@ -65,6 +72,7 @@ export const HomeView = ({
         getMemberName={getMemberName}
       />
 
+      {/* 精算項目が1件以上ある場合のみ詳細フローを表示可能にする。 */}
       {eventData.expenses.length > 0 && (
         <SettlementDetails
           members={eventData.members}

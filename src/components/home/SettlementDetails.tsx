@@ -39,10 +39,13 @@ export const SettlementDetails = ({
   showDetails,
   onToggle,
 }: SettlementDetailsProps) => {
+  // null は「全表示モード」を意味する。空配列は「全解除」。
   const [manualSelectedMemberIds, setManualSelectedMemberIds] = useState<string[] | null>(null);
 
+  // 現在存在するメンバー ID 一覧。
   const allMemberIds = useMemo(() => members.map((member) => member.id), [members]);
 
+  // メンバー変更で存在しない ID が残らないように選択集合を正規化する。
   const selectedMemberIds = useMemo(() => {
     if (manualSelectedMemberIds === null) return allMemberIds;
 
@@ -50,8 +53,10 @@ export const SettlementDetails = ({
     return manualSelectedMemberIds.filter((id) => memberSet.has(id));
   }, [manualSelectedMemberIds, allMemberIds]);
 
+  // 描画時の検索を O(1) にするため Set 化。
   const selectedSet = useMemo(() => new Set(selectedMemberIds), [selectedMemberIds]);
 
+  // 1メンバーずつ選択トグル。
   const toggleMemberSelection = (memberId: string) => {
     setManualSelectedMemberIds((prev) => {
       const currentSelected = prev === null ? allMemberIds : prev;
@@ -64,13 +69,16 @@ export const SettlementDetails = ({
     });
   };
 
+  // メンバーごとの「支払う/受け取る/最終結果」詳細を組み立てる。
   const detailByMember = useMemo(() => {
     return members.map((member) => {
       const payEntries: PayEntry[] = [];
       const receiveEntries: ReceiveEntry[] = [];
+      // 最終精算の相手ごと差額（+なら受取、-なら支払）。
       const transferMap = new Map<string, number>();
 
       breakdowns.forEach((breakdown) => {
+        // 自分の負担分は「支払う額」に積む。
         const ownItem = breakdown.items.find((item) => item.memberId === member.id);
 
         if (ownItem) {
@@ -83,6 +91,7 @@ export const SettlementDetails = ({
           });
         }
 
+        // 自分が立替者なら、他メンバー分は「受け取る額」に積む。
         if (breakdown.payerId === member.id) {
           breakdown.items.forEach((item) => {
             if (item.memberId === member.id) return;
@@ -97,6 +106,7 @@ export const SettlementDetails = ({
         }
       });
 
+      // 最終 transfer から相手別の受払差額を集計。
       transfers.forEach((transfer) => {
         if (transfer.fromMemberId === member.id) {
           const current = transferMap.get(transfer.toMemberId) ?? 0;
@@ -109,6 +119,7 @@ export const SettlementDetails = ({
         }
       });
 
+      // 金額絶対値の大きい順に並べて可読性を高める。
       const totalResults: TotalResultEntry[] = Array.from(transferMap.entries())
         .filter(([, amount]) => Math.abs(amount) > 0)
         .map(([counterpartId, amount]) => ({ counterpartId, amount }))
@@ -123,6 +134,7 @@ export const SettlementDetails = ({
     });
   }, [members, breakdowns, transfers]);
 
+  // フィルタで選択されたメンバーのみ表示。
   const visibleDetails = detailByMember.filter((detail) => selectedSet.has(detail.member.id));
 
   return (
@@ -278,6 +290,7 @@ export const SettlementDetails = ({
                   ) : (
                     <ul className="space-y-2">
                       {detail.totalResults.map((entry) => {
+                        // プラスは受取、マイナスは支払。
                         const isReceive = entry.amount > 0;
                         return (
                           <li

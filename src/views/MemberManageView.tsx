@@ -14,12 +14,16 @@ export const MemberManageView = ({
   setEventData,
   showToast,
 }: MemberManageViewProps) => {
+  // 新規追加入力欄。
   const [newMemberName, setNewMemberName] = useState('');
+  // インライン編集対象 ID と編集中テキスト。
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
 
+  // 表記ゆれを吸収して重複判定するための正規化。
   const normalizeName = (name: string) => name.trim().toLocaleLowerCase();
 
+  // 既存メンバーとの重複を確認。編集時は自分自身を除外できる。
   const isDuplicateName = (name: string, excludeMemberId?: string) => {
     const target = normalizeName(name);
     return eventData.members.some(
@@ -29,6 +33,7 @@ export const MemberManageView = ({
     );
   };
 
+  // メンバー追加処理。
   const addMember = () => {
     const nextName = newMemberName.trim();
     if (!nextName) return;
@@ -50,6 +55,7 @@ export const MemberManageView = ({
     setNewMemberName('');
   };
 
+  // メンバー削除時は、全精算項目から該当メンバーの ratio も同時に削除して整合性を保つ。
   const removeMember = (memberId: string) => {
     setEventData({
       ...eventData,
@@ -61,16 +67,19 @@ export const MemberManageView = ({
     });
   };
 
+  // インライン編集開始。
   const startEditingMember = (member: Member) => {
     setEditingMemberId(member.id);
     setEditingName(member.name);
   };
 
+  // インライン編集キャンセル。
   const cancelEditingMember = () => {
     setEditingMemberId(null);
     setEditingName('');
   };
 
+  // メンバー名保存処理。
   const saveMemberName = (memberId: string) => {
     const nextName = editingName.trim();
     if (!nextName) return;

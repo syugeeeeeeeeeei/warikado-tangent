@@ -15,6 +15,7 @@ export const DataManagement = ({
   onLoadJson,
 }: DataManagementProps) => {
   return (
+    // データ入出力の操作群をまとめたセクション。
     <section className="pt-4 border-t border-gray-200">
       <h3 className="text-sm font-bold text-gray-400 mb-3 ml-2">データ管理</h3>
       <div className="grid grid-cols-2 gap-3">
@@ -35,6 +36,7 @@ export const DataManagement = ({
           <input
             type="file"
             accept=".json"
+            // 見た目はラベルをボタン化し、input 自体は隠す。
             className="hidden"
             ref={fileInputRef}
             onChange={onLoadJson}

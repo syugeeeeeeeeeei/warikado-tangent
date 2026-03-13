@@ -1,5 +1,6 @@
 import type { CalculationLog, EventData } from '../types/domain';
 
+// Blob を一時 URL 化してブラウザダウンロードを発火する共通関数。
 const triggerDownload = (blob: Blob, filename: string) => {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
@@ -9,6 +10,7 @@ const triggerDownload = (blob: Blob, filename: string) => {
   URL.revokeObjectURL(url);
 };
 
+// 現在のイベントデータを JSON として保存する。
 export const saveEventDataAsJson = (eventData: EventData) => {
   const blob = new Blob([JSON.stringify(eventData, null, 2)], {
     type: 'application/json',
@@ -16,29 +18,34 @@ export const saveEventDataAsJson = (eventData: EventData) => {
   triggerDownload(blob, `popsplit_${eventData.name || 'event'}.json`);
 };
 
+// 計算ログを Excel で開きやすい CSV（UTF-8 BOM 付き）で出力する。
 export const exportLogsAsCsv = (
   logs: CalculationLog[],
   getMemberName: (id: string) => string,
   eventName: string,
 ) => {
+  // ヘッダー行から開始し、1ログ=1行で積み上げる。
   let csv = 'メンバー名,精算項目,計算式,負担額,支払済,差引残高\n';
   logs.forEach((log) => {
     const memberName = getMemberName(log.memberId);
     csv += `"${memberName}","${log.expenseName}","${log.formula}",${log.amountOwed},${log.amountPaid},${log.net}\n`;
   });
 
+  // 日本語環境での文字化けを避けるため BOM を先頭に付与する。
   const blob = new Blob([new Uint8Array([0xef, 0xbb, 0xbf]), csv], {
     type: 'text/csv;charset=utf-8',
   });
   triggerDownload(blob, `popsplit_details_${eventName || 'event'}.csv`);
 };
 
+// JSON ファイルを読み込み、最低限の構造（members/expenses）を検証して返す。
 export const readEventDataFromJsonFile = (file: File): Promise<EventData> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
     reader.onload = (event) => {
       try {
+        // FileReader の result は string/ArrayBuffer になり得るため文字列化して扱う。
         const raw = String(event.target?.result ?? '');
         const parsed = JSON.parse(raw);
         if (
@@ -56,6 +63,7 @@ export const readEventDataFromJsonFile = (file: File): Promise<EventData> => {
       }
     };
 
+    // 読み込み失敗時は FileReader 側のエラーを優先して返す。
     reader.onerror = () => reject(reader.error ?? new Error('Read failed'));
     reader.readAsText(file);
   });

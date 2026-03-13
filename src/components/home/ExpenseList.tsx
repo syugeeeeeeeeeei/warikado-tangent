@@ -9,12 +9,14 @@ interface ExpenseListProps {
   onAddExpense: () => void;
 }
 
+// 対象メンバー表示の見切れ対策用レイアウト定義。
 const TARGET_MEMBER_LAYOUT = {
   pageSize: 5,
   maxColumns: 5,
   minColumnWidthRem: 1.5,
 } as const;
 
+// メンバー数に応じてアバターグリッドの列数を決める。
 const getTargetGridStyle = (memberCount: number) => {
   const columnCount = Math.max(
     1,
@@ -27,6 +29,7 @@ const getTargetGridStyle = (memberCount: number) => {
   };
 };
 
+// アバター表示に使う先頭1文字を取得。
 const getNameInitial = (name: string) => {
   const trimmed = name.trim();
   return trimmed.length > 0 ? trimmed[0] : '?';
@@ -38,13 +41,16 @@ export const ExpenseList = ({
   onEditExpense,
   onAddExpense,
 }: ExpenseListProps) => {
+  // 精算項目ごとの「現在何人まで表示するか」を保持する。
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
 
+  // 初期は pageSize 人、以後は状態に応じた表示人数を返す。
   const getVisibleCount = (expenseId: string, total: number) => {
     const current = visibleCounts[expenseId] ?? TARGET_MEMBER_LAYOUT.pageSize;
     return Math.min(current, total);
   };
 
+  // 「もっと見る」で pageSize ずつ増やす。
   const showMoreMembers = (expenseId: string, total: number) => {
     setVisibleCounts((prev) => ({
       ...prev,
@@ -55,6 +61,7 @@ export const ExpenseList = ({
     }));
   };
 
+  // 折りたたみで初期表示人数へ戻す。
   const collapseMembers = (expenseId: string) => {
     setVisibleCounts((prev) => ({
       ...prev,
@@ -88,9 +95,12 @@ export const ExpenseList = ({
                 .filter((ratio) => ratio.ratio > 0)
                 .map((ratio) => ratio.memberId);
 
+              // 元の並び順を保持するため、ソート時のタイブレークに利用する。
               const orderMap = new Map<string, number>();
               targetIds.forEach((id, index) => orderMap.set(id, index));
 
+              // 表示優先度:
+              // 1. 立替者 2. 端数負担者 3. その他（登録順）
               const prioritizedTargetIds = [...targetIds].sort((a, b) => {
                 const aPriority = a === expense.payerId ? 0 : a === expense.fractionBearerId ? 1 : 2;
                 const bPriority = b === expense.payerId ? 0 : b === expense.fractionBearerId ? 1 : 2;
@@ -102,6 +112,7 @@ export const ExpenseList = ({
 
               const visibleCount = getVisibleCount(expense.id, prioritizedTargetIds.length);
               const visibleTargetIds = prioritizedTargetIds.slice(0, visibleCount);
+              // 追加表示ボタン/折りたたみボタンの表示条件を計算。
               const hasMoreMembers = visibleCount < prioritizedTargetIds.length;
               const canCollapse =
                 prioritizedTargetIds.length > TARGET_MEMBER_LAYOUT.pageSize &&
@@ -168,6 +179,7 @@ export const ExpenseList = ({
                         {hasMoreMembers ? (
                           <button
                             onClick={(event) => {
+                              // 親 li の編集遷移クリックを止める。
                               event.stopPropagation();
                               showMoreMembers(expense.id, prioritizedTargetIds.length);
                             }}
@@ -183,6 +195,7 @@ export const ExpenseList = ({
                         ) : (
                           <button
                             onClick={(event) => {
+                              // 親 li の編集遷移クリックを止める。
                               event.stopPropagation();
                               collapseMembers(expense.id);
                             }}

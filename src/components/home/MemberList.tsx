@@ -8,6 +8,7 @@ interface MemberListProps {
 
 export const MemberList = ({ members, onManageMembers }: MemberListProps) => {
   return (
+    // ホーム画面でメンバー一覧と管理画面への導線を提供する。
     <section>
       <div className="flex justify-between items-end mb-3 px-1">
         <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -25,6 +26,7 @@ export const MemberList = ({ members, onManageMembers }: MemberListProps) => {
         {members.length === 0 ? (
           <p className="text-center text-gray-400 text-sm py-4 w-full">登録なし</p>
         ) : (
+          // メンバーはタグ表示で一覧性を重視。
           members.map((member) => (
             <div
               key={member.id}

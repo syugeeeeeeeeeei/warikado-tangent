@@ -13,6 +13,7 @@ export const SettlementSummary = ({
   getMemberName,
 }: SettlementSummaryProps) => {
   return (
+    // 最終精算の要点だけを先に見せるサマリー。
     <section>
       <div className="flex justify-between items-end mb-3 px-1">
         <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -21,14 +22,17 @@ export const SettlementSummary = ({
       </div>
       <div className="bg-white p-5 rounded-2xl shadow-sm border border-orange-100/50">
         {expensesCount === 0 ? (
+          // まだ項目がない場合の案内。
           <p className="text-center text-gray-400 text-sm py-4">
             右下の「＋」から精算項目を追加してください
           </p>
         ) : transfers.length === 0 ? (
+          // 全員の収支が一致している状態。
           <div className="text-center py-4 text-green-600 font-bold">
             🎉 全員の精算が完了しています！
           </div>
         ) : (
+          // 必要な送金のみをリスト化して表示。
           <ul className="space-y-3">
             {transfers.map((transfer, index) => (
               <li

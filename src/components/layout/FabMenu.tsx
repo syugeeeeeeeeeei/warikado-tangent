@@ -17,6 +17,7 @@ export const FabMenu = ({
 }: FabMenuProps) => {
   return (
     <>
+      {/* メニュー展開時は背景クリックで閉じられるようにオーバーレイを表示する。 */}
       {isOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/5 backdrop-blur-[1px]"
@@ -25,6 +26,7 @@ export const FabMenu = ({
       )}
 
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+        {/* サブアクションは展開中のみ表示し、主要導線を邪魔しない。 */}
         {isOpen && (
           <div className="flex flex-col gap-3 mb-2 animate-fade-in-up origin-bottom">
             <button
@@ -42,6 +44,7 @@ export const FabMenu = ({
           </div>
         )}
 
+        {/* トグルボタンは開閉状態を回転・色で明示する。 */}
         <button
           onClick={onToggle}
           className={`w-14 h-14 flex items-center justify-center rounded-full text-white shadow-xl transition-all duration-300 ${

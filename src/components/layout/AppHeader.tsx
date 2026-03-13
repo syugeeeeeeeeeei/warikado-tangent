@@ -17,6 +17,7 @@ export const AppHeader = ({
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-orange-100">
       <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+        {/* ホーム以外では戻るボタンを表示。ホームでは左右バランス保持用のダミーを置く。 */}
         {currentView !== 'home' ? (
           <button
             onClick={onBackHome}
@@ -31,6 +32,7 @@ export const AppHeader = ({
 
         <div className="flex flex-col items-center flex-1">
           <h1 className="text-xl font-extrabold text-orange-600 tracking-tight">勾配割り勘ツール</h1>
+          {/* ホームではイベント名を直接編集可能。その他画面では読み取り専用表示。 */}
           {currentView === 'home' ? (
             <input
               type="text"

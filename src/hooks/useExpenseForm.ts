@@ -25,27 +25,33 @@ export interface PreviewItem {
   hasFraction: boolean;
 }
 
+// 比率入力は小数第2位までを扱う（1.23% まで）。
 const RATIO_DECIMAL_PLACES = 2;
 const RATIO_SCALE = 10 ** RATIO_DECIMAL_PLACES;
 const TOTAL_RATIO_UNITS = 100 * RATIO_SCALE;
+// 負担対象として有効な最小値（=1.00%）。
 const MIN_ACTIVE_RATIO_UNITS = 1 * RATIO_SCALE;
 
+// パーセント値を整数ユニットへ変換し、誤差を制御しやすくする。
 const toRatioUnits = (value: number) => Math.round(value * RATIO_SCALE);
 
 const fromRatioUnits = (units: number) => {
   return Number((units / RATIO_SCALE).toFixed(RATIO_DECIMAL_PLACES));
 };
 
+// RatioValue(number|string) を安全に number 化する。
 const parseRatioValue = (value: RatioValue | undefined) => {
   if (typeof value === 'number') return value;
   return Number.parseFloat(String(value ?? '').trim()) || 0;
 };
 
+// 先頭ゼロを整形して入力表現を安定させる（例: 0008 -> 8）。
 const normalizeIntegerPart = (value: string) => {
   const stripped = value.replace(/^0+(?=\d)/, '');
   return stripped === '' ? '0' : stripped;
 };
 
+// ユーザー入力を「数字と小数点のみ」に制限し、小数桁数も上限をかける。
 const sanitizeRatioInput = (raw: string) => {
   const dotted = raw.replace(/,/g, '.');
   const onlyAllowed = dotted.replace(/[^0-9.]/g, '');
@@ -76,6 +82,7 @@ const sanitizeRatioInput = (raw: string) => {
   return `${intPart}.${decimalPart}`;
 };
 
+// ユニット値を入力欄表示用の文字列へ変換（不要な末尾ゼロを削る）。
 const formatUnitsAsInput = (units: number): string => {
   const safe = Math.max(0, units);
   if (safe === 0) return '0';
@@ -92,11 +99,13 @@ export const useExpenseForm = ({
   navigateTo,
   showToast,
 }: UseExpenseFormParams) => {
+  // 編集モード時は既存精算項目を読み出して初期値に使う。
   const isEditing = Boolean(editingExpenseId);
   const editingExpense = isEditing
     ? eventData.expenses.find((expense) => expense.id === editingExpenseId)
     : null;
 
+  // 入力フォーム state 群。
   const [expenseName, setExpenseName] = useState(editingExpense?.name || '');
   const [amountStr, setAmountStr] = useState<string>(
     editingExpense ? editingExpense.amount.toString() : '',
@@ -111,6 +120,7 @@ export const useExpenseForm = ({
     editingExpense?.fractionBearerId || editingExpense?.payerId || eventData.members[0]?.id || '',
   );
 
+  // 編集時に既存データから負担対象・比率・編集済みフラグを復元する。
   const initialActiveTargets: Record<string, boolean> = {};
   const initialRatios: Record<string, RatioValue> = {};
   const initialEditedRatios: Record<string, boolean> = {};
@@ -133,22 +143,26 @@ export const useExpenseForm = ({
     initialEditedRatios,
   );
 
+  // 現在「負担対象として有効なメンバー ID 一覧」を返す。
   const getActiveIds = () => {
     return eventData.members
       .map((member) => member.id)
       .filter((id) => activeTargets[id]);
   };
 
+  // 金額は整数円のみ扱うため、数字以外と先頭ゼロを除去する。
   const handleAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
     const normalized = event.target.value.replace(/[^0-9]/g, '').replace(/^0+/, '');
     setAmountStr(normalized);
   };
 
+  // 「編集済みメンバーを固定しつつ、未編集メンバーへ残り比率を配る」計算。
   const calculateUneditedRatios = (
     currentActiveIds: string[],
     currentRatios: Record<string, RatioValue>,
     currentEdited: Record<string, boolean>,
   ): Record<string, RatioValue> => {
+    // 対象が1人なら必ず 100%。
     if (currentActiveIds.length === 1) {
       return { ...currentRatios, [currentActiveIds[0]]: 100 };
     }
@@ -167,6 +181,7 @@ export const useExpenseForm = ({
     const newRatios = { ...currentRatios };
     const remainingUnits = Math.max(0, TOTAL_RATIO_UNITS - editedSumUnits);
 
+    // 未編集メンバーへ均等配分し、余りは先頭から 1 ユニットずつ載せる。
     if (uneditedIds.length > 0) {
       const baseUnits = Math.floor(remainingUnits / uneditedIds.length);
       let remainder = remainingUnits % uneditedIds.length;
@@ -184,10 +199,12 @@ export const useExpenseForm = ({
     return newRatios;
   };
 
+  // 負担対象に 0% が発生したとき、最低 1.00% を割り当てるための再配分。
   const redistributeIfAnyZero = (
     currentActiveIds: string[],
     currentRatios: Record<string, RatioValue>,
   ): { ratios: Record<string, RatioValue>; redistributed: boolean } => {
+    // 1人以下は再配分不要。100人超は最小比率制約と両立しないため対象外。
     if (currentActiveIds.length <= 1 || currentActiveIds.length > 100) {
       return { ratios: currentRatios, redistributed: false };
     }
@@ -202,6 +219,7 @@ export const useExpenseForm = ({
       return { ratios: currentRatios, redistributed: false };
     }
 
+    // まず 0 以下の人を最小比率へ引き上げる。
     entries.forEach((entry) => {
       if (entry.valueUnits <= 0) {
         entry.valueUnits = MIN_ACTIVE_RATIO_UNITS;
@@ -210,6 +228,7 @@ export const useExpenseForm = ({
 
     let totalUnits = entries.reduce((sum, entry) => sum + entry.valueUnits, 0);
 
+    // 合計が 100% を超えた分は、余裕のある人（最小比率より上）から差し引く。
     while (totalUnits > TOTAL_RATIO_UNITS) {
       const donors = entries
         .filter((entry) => entry.valueUnits > MIN_ACTIVE_RATIO_UNITS)
@@ -228,6 +247,7 @@ export const useExpenseForm = ({
       }
     }
 
+    // 合計が 100% 未満なら、最大比率の人へ 1 ユニットずつ戻して調整する。
     while (totalUnits < TOTAL_RATIO_UNITS) {
       const receiver = entries.reduce((max, entry) =>
         entry.valueUnits > max.valueUnits ? entry : max,
@@ -244,6 +264,7 @@ export const useExpenseForm = ({
     return { ratios: nextRatios, redistributed: true };
   };
 
+  // 比率合計を 100% に正規化する。必要なら preferredId を優先して増減に使う。
   const normalizeTotalToHundred = (
     currentActiveIds: string[],
     currentRatios: Record<string, RatioValue>,
@@ -253,6 +274,7 @@ export const useExpenseForm = ({
       return { ratios: currentRatios, normalized: false, failed: false };
     }
 
+    // 対象1人時は常に 100%。
     if (currentActiveIds.length === 1) {
       return {
         ratios: { ...currentRatios, [currentActiveIds[0]]: 100 },
@@ -265,6 +287,7 @@ export const useExpenseForm = ({
       return { ratios: currentRatios, normalized: false, failed: true };
     }
 
+    // 最小比率制約を保ったままユニット化して計算する。
     const entries = currentActiveIds.map((id) => ({
       id,
       valueUnits: Math.max(MIN_ACTIVE_RATIO_UNITS, toRatioUnits(parseRatioValue(currentRatios[id]))),
@@ -273,6 +296,7 @@ export const useExpenseForm = ({
     const originalTotal = entries.reduce((sum, entry) => sum + entry.valueUnits, 0);
     let totalUnits = originalTotal;
 
+    // 不足分は preferredId（なければ最大比率）へ寄せる。
     if (totalUnits < TOTAL_RATIO_UNITS) {
       const receiver =
         entries.find((entry) => entry.id === preferredId) ??
@@ -283,6 +307,7 @@ export const useExpenseForm = ({
       totalUnits = TOTAL_RATIO_UNITS;
     }
 
+    // 超過分は preferredId 優先、その後は大きい比率から順に削る。
     if (totalUnits > TOTAL_RATIO_UNITS) {
       let excess = totalUnits - TOTAL_RATIO_UNITS;
       const preferredEntry = preferredId
@@ -306,6 +331,7 @@ export const useExpenseForm = ({
         excess -= diff;
       }
 
+      // 最小比率制約により削り切れない場合は失敗として扱う。
       if (excess > 0) {
         return { ratios: currentRatios, normalized: false, failed: true };
       }
@@ -323,6 +349,7 @@ export const useExpenseForm = ({
     };
   };
 
+  // 0% 再配分 -> 合計100%補正をまとめて実行するユーティリティ。
   const adjustRatios = (
     currentActiveIds: string[],
     sourceRatios: Record<string, RatioValue>,
@@ -343,6 +370,7 @@ export const useExpenseForm = ({
     };
   };
 
+  // 比率 state へ適用し、必要時に自動補正の通知も行う。
   const applyRatios = (
     currentActiveIds: string[],
     nextRatios: Record<string, RatioValue>,
@@ -350,6 +378,7 @@ export const useExpenseForm = ({
     avoidZero = true,
     preferredId?: string,
   ) => {
+    // avoidZero=false は入力途中（空文字など）で補正をかけないためのモード。
     if (!avoidZero) {
       setRatios(nextRatios);
       return;
@@ -375,15 +404,18 @@ export const useExpenseForm = ({
     }
   };
 
+  // 負担対象メンバーの ON/OFF。
   const toggleTarget = (memberId: string) => {
     setActiveTargets((prev) => {
       const isCurrentlyActive = prev[memberId] ?? false;
       const nextState = { ...prev, [memberId]: !isCurrentlyActive };
       const activeIds = Object.keys(nextState).filter((id) => nextState[id]);
 
+      // 対象集合が変わると比率の意味が変わるため、編集済み状態はリセットして再計算する。
       setEditedRatios({});
       applyRatios(activeIds, calculateUneditedRatios(activeIds, {}, {}), false);
 
+      // 端数負担者が対象外になった場合は有効メンバーへフォールバックする。
       if (!nextState[fractionBearerId] && activeIds.length > 0) {
         setFractionBearerId(activeIds[0]);
       } else if (activeIds.length === 0) {
@@ -394,10 +426,12 @@ export const useExpenseForm = ({
     });
   };
 
+  // 個別比率入力時のハンドラ。入力値を sanitization したうえで未編集分を再配分する。
   const handleRatioChange = (memberId: string, value: string) => {
     const activeIds = getActiveIds();
     const sanitized = sanitizeRatioInput(value);
 
+    // 空入力は一時的に許容し、blur 時に最終補正する。
     if (sanitized === '') {
       const newRatios = { ...ratios, [memberId]: '' };
       const newEditedRatios = { ...editedRatios, [memberId]: true };
@@ -414,6 +448,7 @@ export const useExpenseForm = ({
     const inputUnits = toRatioUnits(parseRatioValue(sanitized));
     let otherEditedUnits = 0;
 
+    // 他メンバーの編集済み比率を固定したときの残り上限を算出する。
     activeIds.forEach((id) => {
       if (id !== memberId && editedRatios[id]) {
         otherEditedUnits += toRatioUnits(parseRatioValue(ratios[id]));
@@ -421,6 +456,7 @@ export const useExpenseForm = ({
     });
 
     const maxAllowedUnits = Math.max(0, TOTAL_RATIO_UNITS - otherEditedUnits);
+    // 上限超過入力は自動で丸める。
     const nextInput =
       inputUnits > maxAllowedUnits
         ? formatUnitsAsInput(maxAllowedUnits)
@@ -437,11 +473,13 @@ export const useExpenseForm = ({
     );
   };
 
+  // 比率入力欄を離れたタイミングで 0%/合計100% 補正を確定させる。
   const handleRatioBlur = (memberId: string) => {
     const activeIds = getActiveIds();
     const currentValue = ratios[memberId];
     const parsedValue = parseRatioValue(currentValue);
 
+    // 空欄や 0 以下は「未編集扱い」に戻して再配分する。
     if (currentValue === '' || parsedValue <= 0) {
       const newEditedRatios = { ...editedRatios, [memberId]: false };
       const clearedRatios = { ...ratios, [memberId]: 0 };
@@ -457,6 +495,7 @@ export const useExpenseForm = ({
       return;
     }
 
+    // 通常時も blur で最終的な補正を反映する。
     applyRatios(
       activeIds,
       calculateUneditedRatios(activeIds, { ...ratios }, { ...editedRatios }),
@@ -466,6 +505,7 @@ export const useExpenseForm = ({
     );
   };
 
+  // 勾配モードの比率を均等化する。
   const equalizeRatios = () => {
     const activeIds = getActiveIds();
     if (activeIds.length === 0) return;
@@ -475,6 +515,7 @@ export const useExpenseForm = ({
       return;
     }
 
+    // 100% を整数ユニットで均等に割り、余りは先頭から配る。
     const baseUnits = Math.floor(TOTAL_RATIO_UNITS / activeIds.length);
     let remainder = TOTAL_RATIO_UNITS % activeIds.length;
     const nextRatios = { ...ratios };
@@ -492,11 +533,13 @@ export const useExpenseForm = ({
     setRatios(nextRatios);
   };
 
+  // 入力検証 -> 比率確定 -> EventData 更新を行う保存処理。
   const saveExpense = () => {
     const numAmount = parseInt(amountStr, 10);
     if (!expenseName || Number.isNaN(numAmount) || numAmount <= 0 || !payerId) return;
     const activeIds = getActiveIds();
 
+    // 保存直前に未編集分再配分と最終補正を実行する。
     const recalculated = calculateUneditedRatios(activeIds, { ...ratios }, { ...editedRatios });
     const adjusted = adjustRatios(activeIds, recalculated, activeIds[0]);
     const finalizedRatios = adjusted.ratios;
@@ -516,16 +559,19 @@ export const useExpenseForm = ({
       return;
     }
 
+    // 全メンバー分の ratios を作成し、対象外は 0 にする。
     const expenseRatios: ExpenseRatio[] = eventData.members.map((member) => {
       const isTarget = activeTargets[member.id] ?? false;
       if (!isTarget) return { memberId: member.id, ratio: 0 };
 
+      // 非勾配モードでは ratio>0 のみ意味があるため最低 1 を担保する。
       const ratioNum = fromRatioUnits(toRatioUnits(parseRatioValue(finalizedRatios[member.id])));
       const ratioVal = isGradientMode ? ratioNum : Math.max(ratioNum, 1);
 
       return { memberId: member.id, ratio: ratioVal };
     });
 
+    // 勾配モードは総和100%を厳密チェックする。
     if (isGradientMode) {
       const activeTotalUnits = expenseRatios
         .filter((ratio) => activeIds.includes(ratio.memberId))
@@ -537,6 +583,7 @@ export const useExpenseForm = ({
       }
     }
 
+    // 全員 0 は不正（対象者なし）として保存不可。
     if (expenseRatios.reduce((acc, ratio) => acc + ratio.ratio, 0) === 0) {
       alert('負担対象者がいない、または勾配の合計が0です。');
       return;
@@ -552,6 +599,7 @@ export const useExpenseForm = ({
       fractionBearerId,
     };
 
+    // 編集時は置換、新規時は末尾追加。
     if (isEditing) {
       setEventData({
         ...eventData,
@@ -566,9 +614,11 @@ export const useExpenseForm = ({
       });
     }
 
+    // 保存完了後はホームへ戻す。
     navigateTo('home');
   };
 
+  // 編集対象の精算項目を削除する。
   const removeExpense = () => {
     if (!isEditing || !editingExpenseId) return;
 
@@ -580,6 +630,7 @@ export const useExpenseForm = ({
     navigateTo('home');
   };
 
+  // フォーム入力中のプレビュー内訳を計算する（保存前でも確認可能）。
   const previewData = useMemo<PreviewItem[] | null>(() => {
     if (eventData.members.length === 0) return null;
 
@@ -601,6 +652,7 @@ export const useExpenseForm = ({
         };
       });
 
+    // 勾配モードでは比率合計、通常モードでは対象人数が分母になる。
     const totalRatio = targets.reduce((acc, target) => acc + target.ratio, 0);
     if (totalRatio === 0) return null;
 
@@ -613,6 +665,7 @@ export const useExpenseForm = ({
       }
     });
 
+    // 切り捨てで生じた端数を負担者へ付与する。
     const fraction = numAmount - totalBaseOwed;
 
     let bearer = targets.find((target) => target.id === fractionBearerId && target.ratio > 0);
@@ -629,10 +682,12 @@ export const useExpenseForm = ({
       .map((target) => ({
         name: target.name,
         owed: target.finalOwed,
+        // 表示上、端数が載った行をバッジで区別する。
         hasFraction: target.id === bearer?.id && fraction > 0,
       }));
   }, [amountStr, activeTargets, eventData.members, fractionBearerId, isGradientMode, ratios]);
 
+  // 保存ボタンの活性条件。
   const isSaveDisabled =
     !expenseName ||
     !amountStr ||

@@ -18,6 +18,7 @@ export const ExpenseManageView = ({
   navigateTo,
   showToast,
 }: ExpenseManageViewProps) => {
+  // フォームの状態管理と保存ロジックは専用フックへ集約している。
   const {
     isEditing,
     expenseName,
@@ -49,10 +50,12 @@ export const ExpenseManageView = ({
     showToast,
   });
 
+  // 精算項目はメンバーがいないと成立しないため、先に登録を促す。
   if (eventData.members.length === 0) {
     return <div className="text-center py-10 text-gray-500">先にホーム画面からメンバーを登録してください</div>;
   }
 
+  // 現在「負担対象に含まれているメンバー」だけを抽出。
   const activeMembers = eventData.members.filter((member) => activeTargets[member.id]);
 
   return (
@@ -152,6 +155,7 @@ export const ExpenseManageView = ({
               </button>
             </div>
 
+            {/* 勾配モード時は個別比率入力 UI を表示。通常モードでは対象選択のみで等分する。 */}
             {isGradientMode && (
               <div className="grid grid-cols-2 gap-2 mt-3 animate-fade-in">
                 <div className="col-span-2 flex justify-end">
@@ -164,6 +168,7 @@ export const ExpenseManageView = ({
                 </div>
                 {activeMembers.map((member) => {
                   const isEdited = editedRatios[member.id] ?? false;
+                  // 0 は空欄として見せ、入力体験を自然にする。
                   const displayValue = ratios[member.id] === 0 ? '' : (ratios[member.id] ?? '');
 
                   return (
@@ -217,6 +222,7 @@ export const ExpenseManageView = ({
                   {member.name}
                 </option>
               ))}
+              {/* 対象なし時の placeholder option */}
               {activeMembers.length === 0 && <option value="">対象メンバーを選択してください</option>}
             </select>
             <p className="text-[10px] text-gray-400 ml-1 mt-1">
@@ -224,6 +230,7 @@ export const ExpenseManageView = ({
             </p>
           </div>
 
+          {/* 保存前の負担見込みを即時表示し、入力ミスを減らす。 */}
           {previewData && previewData.length > 0 && (
             <div className="bg-sky-50/50 p-3 rounded-2xl border border-sky-100 mt-2">
               <div className="text-[10px] font-bold text-sky-500 mb-2 uppercase tracking-wider">Preview</div>
