@@ -1,15 +1,17 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { DataManagement } from '../components/home/DataManagement';
 import { ExpenseList } from '../components/home/ExpenseList';
 import { MemberList } from '../components/home/MemberList';
 import { SettlementDetails } from '../components/home/SettlementDetails';
 import { SettlementSummary } from '../components/home/SettlementSummary';
 import type { EventData, ViewState } from '../types/domain';
-import { copyTextToClipboard, createShareUrlFromEventData, exportLogsAsCsv } from '../utils/dataIO';
+import { exportLogsAsCsv, readEventDataFromJsonFile, saveEventDataAsJson } from '../utils/dataIO';
 import { calculateSettlement } from '../utils/settlement';
 
 interface HomeViewProps {
   eventData: EventData;
+  setEventData: Dispatch<SetStateAction<EventData>>;
   getMemberName: (id: string) => string;
   navigateTo: (view: ViewState, id?: string | null) => void;
   showToast: (message: string) => void;
@@ -17,51 +19,42 @@ interface HomeViewProps {
 
 export const HomeView = ({
   eventData,
+  setEventData,
   getMemberName,
   navigateTo,
   showToast,
 }: HomeViewProps) => {
   const [showDetails, setShowDetails] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { transfers, logs, breakdowns } = useMemo(() => calculateSettlement(eventData), [eventData]);
+
+  const handleSaveJson = () => {
+    saveEventDataAsJson(eventData);
+    showToast('イベントデータを保存しました');
+  };
+
+  const handleLoadJson = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const parsed = await readEventDataFromJsonFile(file);
+      setEventData(parsed);
+      showToast('データを読み込みました！');
+    } catch (error) {
+      console.error(error);
+      showToast('ファイルの読み込みに失敗しました');
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   const handleExportCsv = () => {
     exportLogsAsCsv(logs, getMemberName, eventData.name);
     showToast('明細をCSVで出力しました');
-  };
-
-  const handleCopyShareUrl = async () => {
-    try {
-      const url = await createShareUrlFromEventData(eventData);
-      const copied = await copyTextToClipboard(url);
-      showToast(copied ? '共有URLをコピーしました' : '共有URLのコピーに失敗しました');
-    } catch (error) {
-      console.error(error);
-      showToast('共有URLのコピーに失敗しました');
-    }
-  };
-
-  const handleShareUrl = async () => {
-    try {
-      const url = await createShareUrlFromEventData(eventData);
-
-      if (typeof navigator.share === 'function') {
-        await navigator.share({
-          title: eventData.name || '勾配割り勘ツール',
-          text: '割り勘データを共有します',
-          url,
-        });
-        showToast('共有が完了しました');
-        return;
-      }
-
-      const copied = await copyTextToClipboard(url);
-      showToast(copied ? '共有機能がないためURLをコピーしました' : '共有URLのコピーに失敗しました');
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') return;
-      console.error(error);
-      showToast('共有に失敗しました');
-    }
   };
 
   return (
@@ -96,10 +89,10 @@ export const HomeView = ({
       />
 
       <DataManagement
+        fileInputRef={fileInputRef}
         onExportCsv={handleExportCsv}
-        onCopyShareUrl={handleCopyShareUrl}
-        onShareUrl={handleShareUrl}
-        canNativeShare={typeof navigator.share === 'function'}
+        onSaveJson={handleSaveJson}
+        onLoadJson={handleLoadJson}
       />
     </div>
   );
