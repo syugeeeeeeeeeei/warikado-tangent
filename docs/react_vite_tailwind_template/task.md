@@ -1,0 +1,24 @@
+# React + Vite + TypeScript + Tailwind テンプレート構築タスク
+
+- [ ] ドキュメントの作成
+  - [x] 実装計画 (`implementation_plan.md`) の作成
+  - [x] タスクリスト (`task.md`) の作成
+- [ ] プロジェクトの初期化
+  - [x] `yarn create vite` を用いたReact+TSプロジェクトの作成
+  - [x] Gitリポジトリの初期化 (`git init`)
+- [ ] Tailwind CSSのセットアップ
+  - [x] パッケージのインストール (`tailwindcss`, `postcss`, `autoprefixer`)
+  - [x] Tailwind設定ファイルの生成 (`tailwind.config.js`, `postcss.config.js`)
+  - [x] `src/index.css` へのTailwindディレクティブ追加
+  - [x] `tailwind.config.js` の `content` パスの設定
+- [ ] Viteの設定 (GitHub Pages向け)
+  - [x] `vite.config.ts` で `base` パスの動的生成を設定
+- [ ] サンプルUIの作成
+  - [x] `src/App.tsx` をTailwindを使った簡単なレイアウトに変更
+- [ ] GitHub Actionsのセットアップ
+  - [x] `.github/workflows/deploy.yml` の作成
+- [x] 動作確認
+  - [x] `yarn build` の実行確認
+  - [x] `yarn dev` でのローカル起動確認 (任意)
+- [x] ドキュメントの最終更新
+  - [x] ウォークスルー (`walkthrough.md`) の作成
