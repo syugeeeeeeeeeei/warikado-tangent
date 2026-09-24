@@ -40,6 +40,7 @@ const run = async () => {
     const encoded = await encodeEventDataToUrlSafe(parsed);
     const decoded = await decodeEventDataFromUrlSafe(encoded.encoded);
 
+    assert.equal(encoded.compression, 'v3', `${caseName}: expected v3 encoder`);
     assert.deepEqual(decoded, parsed, `${caseName}: decode mismatch`);
 
     const rawLength = rawJson.length;
@@ -64,9 +65,10 @@ const run = async () => {
     '# 圧縮テスト分析',
     '',
     '- 対象: `tests/fixtures/share_codec/*.json`',
-    '- 圧縮方式: `CompressionStream(gzip)` + Base64URL + `gz.` プレフィックス',
+    '- 新規URL方式: `v3.` adaptive binary/arithmetic codec + Base64URL',
+    '- 後方互換: 既存 `gz.` URL は decoder のみ維持',
     '',
-    '| ケース | Raw JSON長 | Raw Base64URL長 | 圧縮後文字列長 | Raw比 |',
+    '| ケース | Raw JSON長 | Raw Base64URL長 | V3 URL payload長 | Raw比 |',
     '| --- | ---: | ---: | ---: | ---: |',
     ...rows,
     '',
@@ -74,7 +76,7 @@ const run = async () => {
     '',
     `- 合計 Raw JSON長: ${totalRaw}`,
     `- 合計 Raw Base64URL長: ${totalBase64UrlRaw}`,
-    `- 合計 圧縮後文字列長: ${totalCompressed}`,
+    `- 合計 V3 URL payload長: ${totalCompressed}`,
     `- 全体圧縮率 (Raw比): ${percent(overallRawRatio)}`,
     `- 全体圧縮率 (Raw Base64URL比): ${percent(overallBase64Ratio)}`,
     '',

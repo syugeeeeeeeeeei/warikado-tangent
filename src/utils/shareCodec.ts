@@ -1,23 +1,22 @@
 import type { EventData, Expense, ExpenseRatio, Member } from '../types/domain';
+import { SHARE_CODEC_MODEL_V1 } from './shareCodecModelV1.js';
+import { createCodec } from './shareCodecV3.js';
+import type { SharePayloadV1 } from './shareCodecV3.js';
 
-type SupportedCompressionFormat = 'gzip';
+type SupportedCompressionFormat = 'v3' | 'gzip';
 
-const CURRENT_COMPRESSION_FORMAT: SupportedCompressionFormat = 'gzip';
-const ENCODED_PREFIX = 'gz.';
+type LegacyCompressionFormat = 'gzip';
+const LEGACY_COMPRESSION_FORMAT: LegacyCompressionFormat = 'gzip';
+const LEGACY_ENCODED_PREFIX = 'gz.';
+const CURRENT_ENCODED_PREFIX = 'v3.';
 
-// v1: [version, eventName, memberNames, expenses]
-// expense: [name, amount, payerIndex, gradientMode(0|1), fractionBearerIndex, sparseRatios]
-// sparseRatio: [memberIndex, ratio]
-type ShareRatioTuple = [number, number];
-type ShareExpenseTuple = [
-  string,
-  number,
-  number,
-  0 | 1,
-  number,
-  ShareRatioTuple[],
-];
-type SharePayloadV1 = [1, string, string[], ShareExpenseTuple[]];
+let v3Codec: ReturnType<typeof createCodec> | null = null;
+const getV3Codec = () => {
+  if (!v3Codec) {
+    v3Codec = createCodec(SHARE_CODEC_MODEL_V1);
+  }
+  return v3Codec;
+};
 
 const toArrayBuffer = (bytes: Uint8Array) => {
   return bytes.buffer.slice(
@@ -26,7 +25,6 @@ const toArrayBuffer = (bytes: Uint8Array) => {
   ) as ArrayBuffer;
 };
 
-// ReadableStream を Uint8Array に集約する。
 const readAll = async (stream: ReadableStream<Uint8Array>) => {
   const reader = stream.getReader();
   const chunks: Uint8Array[] = [];
@@ -50,23 +48,9 @@ const readAll = async (stream: ReadableStream<Uint8Array>) => {
   return merged;
 };
 
-const compressBytes = async (
-  input: Uint8Array,
-  format: SupportedCompressionFormat,
-) => {
-  if (typeof CompressionStream === 'undefined') {
-    throw new Error('CompressionStream is not supported in this environment.');
-  }
-
-  const stream = new Blob([toArrayBuffer(input)])
-    .stream()
-    .pipeThrough(new CompressionStream(format));
-  return readAll(stream);
-};
-
 const decompressBytes = async (
   input: Uint8Array,
-  format: SupportedCompressionFormat,
+  format: LegacyCompressionFormat,
 ) => {
   if (typeof DecompressionStream === 'undefined') {
     throw new Error('DecompressionStream is not supported in this environment.');
@@ -78,18 +62,6 @@ const decompressBytes = async (
   return readAll(stream);
 };
 
-const bytesToBase64 = (bytes: Uint8Array) => {
-  let binary = '';
-  const chunkSize = 0x8000;
-
-  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
-    const chunk = bytes.slice(offset, offset + chunkSize);
-    binary += String.fromCharCode(...chunk);
-  }
-
-  return btoa(binary);
-};
-
 const base64ToBytes = (base64: string) => {
   const binary = atob(base64);
   const bytes = new Uint8Array(binary.length);
@@ -99,13 +71,6 @@ const base64ToBytes = (base64: string) => {
   }
 
   return bytes;
-};
-
-const toBase64Url = (bytes: Uint8Array) => {
-  return bytesToBase64(bytes)
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/g, '');
 };
 
 const fromBase64Url = (base64Url: string) => {
@@ -125,18 +90,18 @@ const toSharePayloadV1 = (eventData: EventData): SharePayloadV1 => {
     eventData.members.map((member, index) => [member.id, index]),
   );
 
-  const expenses: ShareExpenseTuple[] = eventData.expenses.map((expense) => {
+  const expenses: SharePayloadV1[3] = eventData.expenses.map((expense) => {
     const payerIndex = memberIdToIndex.get(expense.payerId) ?? 0;
     const fractionBearerIndex =
       memberIdToIndex.get(expense.fractionBearerId) ?? payerIndex;
 
-    const sparseRatios: ShareRatioTuple[] = expense.ratios
+    const sparseRatios: SharePayloadV1[3][number][5] = expense.ratios
       .map((ratio) => {
         const memberIndex = memberIdToIndex.get(ratio.memberId);
         if (memberIndex === undefined || ratio.ratio <= 0) return null;
-        return [memberIndex, ratio.ratio] as ShareRatioTuple;
+        return [memberIndex, ratio.ratio] as [number, number];
       })
-      .filter((pair): pair is ShareRatioTuple => Boolean(pair))
+      .filter((pair): pair is [number, number] => Boolean(pair))
       .sort((a, b) => a[0] - b[0]);
 
     return [
@@ -220,9 +185,10 @@ const isEventDataLike = (parsed: unknown): parsed is EventData => {
 };
 
 const isSharePayloadV1 = (parsed: unknown): parsed is SharePayloadV1 => {
-  if (!Array.isArray(parsed)) return false;
-  if (parsed.length !== 4) return false;
-  return parsed[0] === 1;
+  if (!Array.isArray(parsed) || parsed.length !== 4 || parsed[0] !== 1) {
+    return false;
+  }
+  return Array.isArray(parsed[2]) && Array.isArray(parsed[3]);
 };
 
 export interface EncodedEventDataResult {
@@ -230,30 +196,21 @@ export interface EncodedEventDataResult {
   compression: SupportedCompressionFormat;
 }
 
-// EventData を URL 共有向け文字列に圧縮する。
+// 新規共有URLは常に V3 codec で生成する。
 export const encodeEventDataToUrlSafe = async (
   eventData: EventData,
 ): Promise<EncodedEventDataResult> => {
   const compacted = toSharePayloadV1(eventData);
-  const rawJson = JSON.stringify(compacted);
-  const rawBytes = new TextEncoder().encode(rawJson);
-  const compressed = await compressBytes(rawBytes, CURRENT_COMPRESSION_FORMAT);
+  const encoded = getV3Codec().toUrl(compacted);
 
   return {
-    encoded: `${ENCODED_PREFIX}${toBase64Url(compressed)}`,
-    compression: CURRENT_COMPRESSION_FORMAT,
+    encoded,
+    compression: 'v3',
   };
 };
 
-// URL 共有文字列を EventData に復元する。
-export const decodeEventDataFromUrlSafe = async (
-  encoded: string,
-): Promise<EventData> => {
-  if (!encoded.startsWith(ENCODED_PREFIX)) {
-    throw new Error('Unsupported payload prefix.');
-  }
-
-  const payload = encoded.slice(ENCODED_PREFIX.length);
+const decodeLegacyGzipPayload = async (encoded: string): Promise<EventData> => {
+  const payload = encoded.slice(LEGACY_ENCODED_PREFIX.length);
   if (!payload) {
     throw new Error('Payload is empty.');
   }
@@ -261,12 +218,12 @@ export const decodeEventDataFromUrlSafe = async (
   const compressedBytes = fromBase64Url(payload);
   const decompressed = await decompressBytes(
     compressedBytes,
-    CURRENT_COMPRESSION_FORMAT,
+    LEGACY_COMPRESSION_FORMAT,
   );
   const json = new TextDecoder().decode(decompressed);
   const parsed = JSON.parse(json) as unknown;
 
-  // 互換: 旧フォーマット（EventData直接JSON）も読み込めるようにしておく。
+  // 後方互換: 最初期の EventData 直接 JSON も読み込む。
   if (isEventDataLike(parsed)) {
     return parsed;
   }
@@ -275,5 +232,24 @@ export const decodeEventDataFromUrlSafe = async (
     return fromSharePayloadV1(parsed);
   }
 
-  throw new Error('Invalid event data format.');
+  throw new Error('Invalid legacy event data format.');
+};
+
+// V3 と従来の gz. の両方を復元する。
+export const decodeEventDataFromUrlSafe = async (
+  encoded: string,
+): Promise<EventData> => {
+  if (encoded.startsWith(CURRENT_ENCODED_PREFIX)) {
+    const payload = getV3Codec().fromUrl(encoded);
+    if (!isSharePayloadV1(payload)) {
+      throw new Error('Invalid V3 event data format.');
+    }
+    return fromSharePayloadV1(payload);
+  }
+
+  if (encoded.startsWith(LEGACY_ENCODED_PREFIX)) {
+    return decodeLegacyGzipPayload(encoded);
+  }
+
+  throw new Error('Unsupported payload prefix.');
 };

@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "generate:share-codec-model": "node scripts/generate-share-codec-model.mjs",
+    "prebuild": "node scripts/generate-share-codec-model.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "pretest:share-codec": "node scripts/generate-share-codec-model.mjs",
     "test:share-codec": "node tests/shareCodec.test.cjs",
     "analyze:share-codec": "node tests/shareCodec.analysis.cjs"
   },
