@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "vite",
     "generate:share-codec-model": "node scripts/generate-share-codec-model.mjs",
-    "prebuild": "node scripts/generate-share-codec-model.mjs",
-    "build": "tsc -b && vite build",
+    "build": "yarn generate:share-codec-model && tsc -b && vite build",
     "lint": "eslint .",
     "format": "prettier --write src/utils/shareCodec.ts src/utils/shareCodecV3.ts scripts/generate-share-codec-model.mjs package.json .prettierrc.json",
     "format:check": "prettier --check src/utils/shareCodec.ts src/utils/shareCodecV3.ts scripts/generate-share-codec-model.mjs package.json .prettierrc.json",
