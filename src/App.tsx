@@ -121,7 +121,6 @@ export default function App() {
         {currentView === 'home' && (
           <HomeView
             eventData={eventData}
-            setEventData={setEventData}
             getMemberName={getMemberName}
             navigateTo={navigateTo}
             showToast={showToast}

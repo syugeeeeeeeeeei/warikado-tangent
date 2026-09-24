@@ -1,5 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { useMemo, useState } from 'react';
 import { DataManagement } from '../components/home/DataManagement';
 import { ExpenseList } from '../components/home/ExpenseList';
 import { MemberList } from '../components/home/MemberList';
@@ -7,13 +6,12 @@ import { ShareSheet } from '../components/home/ShareSheet';
 import { SettlementDetails } from '../components/home/SettlementDetails';
 import { SettlementSummary } from '../components/home/SettlementSummary';
 import type { EventData, ViewState } from '../types/domain';
-import { exportLogsAsCsv, readEventDataFromJsonFile } from '../utils/dataIO';
+import { exportLogsAsCsv } from '../utils/dataIO';
 import { encodeEventDataToUrlSafe } from '../utils/shareCodec';
 import { calculateSettlement } from '../utils/settlement';
 
 interface HomeViewProps {
   eventData: EventData;
-  setEventData: Dispatch<SetStateAction<EventData>>;
   getMemberName: (id: string) => string;
   navigateTo: (view: ViewState, id?: string | null) => void;
   showToast: (message: string) => void;
@@ -21,7 +19,6 @@ interface HomeViewProps {
 
 export const HomeView = ({
   eventData,
-  setEventData,
   getMemberName,
   navigateTo,
   showToast,
@@ -31,8 +28,6 @@ export const HomeView = ({
 
   // 精算詳細パネルの開閉状態。
   const [showDetails, setShowDetails] = useState(false);
-  // JSON 読み込み input を外部からリセットするための参照。
-  const fileInputRef = useRef<HTMLInputElement>(null);
   // 共有シート状態。
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
   const [isShareUrlLoading, setIsShareUrlLoading] = useState(false);
@@ -44,26 +39,6 @@ export const HomeView = ({
 
   // eventData が変わるたびに精算結果を再計算する。
   const { transfers, logs, breakdowns } = useMemo(() => calculateSettlement(eventData), [eventData]);
-
-  // JSON ファイル読込。成功時は eventData 全体を置き換える。
-  const handleLoadJson = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const parsed = await readEventDataFromJsonFile(file);
-      setEventData(parsed);
-      showToast('データを読み込みました！');
-    } catch (error) {
-      console.error(error);
-      showToast('ファイルの読み込みに失敗しました');
-    } finally {
-      // 同じファイルを再選択した場合にも onChange が発火するように value を戻す。
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
 
   // 計算ログを CSV 出力。
   const handleExportCsv = () => {
@@ -192,10 +167,8 @@ export const HomeView = ({
       />
 
       <DataManagement
-        fileInputRef={fileInputRef}
         onOpenShare={handleOpenShareSheet}
         onExportCsv={handleExportCsv}
-        onLoadJson={handleLoadJson}
       />
 
       <ShareSheet
