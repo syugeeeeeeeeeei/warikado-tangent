@@ -1,7 +1,7 @@
 import type { EventData, Expense, ExpenseRatio, Member } from '../types/domain';
-import { SHARE_CODEC_MODEL_V1 } from './shareCodecModelV1.js';
-import { createCodec } from './shareCodecV3.js';
-import type { SharePayloadV1 } from './shareCodecV3.js';
+import { SHARE_CODEC_MODEL_V1 } from './shareCodecModelV1.ts';
+import { createCodec } from './shareCodecV3.ts';
+import type { SharePayloadV1 } from './shareCodecV3.ts';
 
 type SupportedCompressionFormat = 'v3' | 'gzip';
 
@@ -48,10 +48,7 @@ const readAll = async (stream: ReadableStream<Uint8Array>) => {
   return merged;
 };
 
-const decompressBytes = async (
-  input: Uint8Array,
-  format: LegacyCompressionFormat,
-) => {
+const decompressBytes = async (input: Uint8Array, format: LegacyCompressionFormat) => {
   if (typeof DecompressionStream === 'undefined') {
     throw new Error('DecompressionStream is not supported in this environment.');
   }

@@ -1,0 +1,3 @@
+node_modules
+dist
+src/utils/shareCodecModelV1.ts
