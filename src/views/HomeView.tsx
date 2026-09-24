@@ -201,7 +201,6 @@ export const HomeView = ({
       <ShareSheet
         isOpen={isShareSheetOpen}
         isLoading={isShareUrlLoading}
-        isNativeShareSupported={isNativeShareSupported}
         shareUrl={shareUrl}
         errorMessage={shareUrlError}
         urlLength={shareUrl.length}

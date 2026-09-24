@@ -3,7 +3,6 @@ import { Copy, Share2, X } from 'lucide-react';
 interface ShareSheetProps {
   isOpen: boolean;
   isLoading: boolean;
-  isNativeShareSupported: boolean;
   shareUrl: string;
   errorMessage: string | null;
   urlLength: number;
@@ -17,7 +16,6 @@ interface ShareSheetProps {
 export const ShareSheet = ({
   isOpen,
   isLoading,
-  isNativeShareSupported,
   shareUrl,
   errorMessage,
   urlLength,
@@ -96,15 +94,13 @@ export const ShareSheet = ({
             <Copy size={16} /> リンクをコピー
           </button>
 
-          {isNativeShareSupported && (
-            <button
-              onClick={onNativeShare}
-              className="w-full bg-white text-sky-700 border border-sky-200 rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-sky-50 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100"
-              disabled={isLoading}
-            >
-              <Share2 size={16} /> 他アプリで共有
-            </button>
-          )}
+          <button
+            onClick={onNativeShare}
+            className="w-full bg-white text-sky-700 border border-sky-200 rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-sky-50 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100"
+            disabled={isLoading}
+          >
+            <Share2 size={16} /> 他アプリで共有
+          </button>
 
         </div>
       </section>
