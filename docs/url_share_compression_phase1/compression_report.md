@@ -1,21 +1,22 @@
 # 圧縮テスト分析
 
 - 対象: `tests/fixtures/share_codec/*.json`
-- 圧縮方式: `CompressionStream(gzip)` + Base64URL + `gz.` プレフィックス
+- 新規URL方式: `v3.` adaptive binary/arithmetic codec + Base64URL
+- 後方互換: 既存 `gz.` URL は decoder のみ維持
 
-| ケース | Raw JSON長 | Raw Base64URL長 | 圧縮後文字列長 | Raw比 |
+| ケース | Raw JSON長 | Raw Base64URL長 | V3 URL payload長 | Raw比 |
 | --- | ---: | ---: | ---: | ---: |
-| case_01_minimal | 493 | 663 | 122 | 24.7% |
-| case_02_small | 3078 | 4136 | 254 | 8.3% |
-| case_03_medium | 15606 | 20915 | 734 | 4.7% |
-| case_04_japanese_boundary | 9629 | 13132 | 675 | 7.0% |
-| case_05_large_dense | 42333 | 56658 | 1493 | 3.5% |
-| suwa_testdata | 10009 | 13706 | 663 | 6.6% |
+| case_01_minimal | 525 | 706 | 37 | 7.0% |
+| case_02_small | 3256 | 4374 | 93 | 2.9% |
+| case_03_medium | 16484 | 22086 | 283 | 1.7% |
+| case_04_japanese_boundary | 10169 | 13852 | 285 | 2.8% |
+| case_05_large_dense | 44707 | 59823 | 598 | 1.3% |
+| suwa_testdata | 10575 | 14460 | 226 | 2.1% |
 
 ## 全体サマリ
 
-- 合計 Raw JSON長: 81148
-- 合計 Raw Base64URL長: 109210
-- 合計 圧縮後文字列長: 3941
-- 全体圧縮率 (Raw比): 4.9%
-- 全体圧縮率 (Raw Base64URL比): 3.6%
+- 合計 Raw JSON長: 85716
+- 合計 Raw Base64URL長: 115301
+- 合計 V3 URL payload長: 1522
+- 全体圧縮率 (Raw比): 1.8%
+- 全体圧縮率 (Raw Base64URL比): 1.3%

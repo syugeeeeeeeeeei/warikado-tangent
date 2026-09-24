@@ -16,8 +16,9 @@ yarn analyze:share-codec
 The generator is pinned to corpus commit:
 `8590ae556bfdb69fdb967941cc4bf43f7f4c2902`.
 
-Generated file:
-`src/utils/shareCodecModelV1.ts`
+Generated files:
+`src/utils/shareCodecModelV1.ts` (TypeScript wrapper)
+`src/utils/shareCodecModelV1.json` (codec model data)
 
 Commit the generated file. Once `v3.` URLs exist in the wild, never modify its ordering/content under the same prefix. Any dictionary/model change must use a new codec prefix.
 
