@@ -1,4 +1,4 @@
-import type { CalculationLog, EventData } from '../types/domain';
+import type { CalculationLog } from '../types/domain';
 
 // Blob を一時 URL 化してブラウザダウンロードを発火する共通関数。
 const triggerDownload = (blob: Blob, filename: string) => {
@@ -8,14 +8,6 @@ const triggerDownload = (blob: Blob, filename: string) => {
   anchor.download = filename;
   anchor.click();
   URL.revokeObjectURL(url);
-};
-
-// 現在のイベントデータを JSON として保存する。
-export const saveEventDataAsJson = (eventData: EventData) => {
-  const blob = new Blob([JSON.stringify(eventData, null, 2)], {
-    type: 'application/json',
-  });
-  triggerDownload(blob, `popsplit_${eventData.name || 'event'}.json`);
 };
 
 // 計算ログを Excel で開きやすい CSV（UTF-8 BOM 付き）で出力する。
@@ -38,33 +30,3 @@ export const exportLogsAsCsv = (
   triggerDownload(blob, `popsplit_details_${eventName || 'event'}.csv`);
 };
 
-// JSON ファイルを読み込み、最低限の構造（members/expenses）を検証して返す。
-export const readEventDataFromJsonFile = (file: File): Promise<EventData> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = (event) => {
-      try {
-        // FileReader の result は string/ArrayBuffer になり得るため文字列化して扱う。
-        const raw = String(event.target?.result ?? '');
-        const parsed = JSON.parse(raw);
-        if (
-          parsed &&
-          typeof parsed === 'object' &&
-          'members' in parsed &&
-          'expenses' in parsed
-        ) {
-          resolve(parsed as EventData);
-          return;
-        }
-        reject(new Error('Invalid format'));
-      } catch (error) {
-        reject(error);
-      }
-    };
-
-    // 読み込み失敗時は FileReader 側のエラーを優先して返す。
-    reader.onerror = () => reject(reader.error ?? new Error('Read failed'));
-    reader.readAsText(file);
-  });
-};

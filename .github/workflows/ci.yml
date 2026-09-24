@@ -1,0 +1,47 @@
+name: Validate pull request
+
+on:
+  pull_request:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Keep this workflow aligned with the build portion of deploy.yml so that a
+# pull request is checked with the same dependency installation and production
+# build that runs after it is merged.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: "ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Run share codec tests
+        run: yarn test:share-codec
+
+      - name: Build for GitHub Pages
+        run: yarn build
+
+      - name: Verify Pages artifact
+        run: test -s dist/index.html

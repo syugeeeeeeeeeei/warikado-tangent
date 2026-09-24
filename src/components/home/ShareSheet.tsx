@@ -1,9 +1,8 @@
-import { Copy, Save, Share2, X } from 'lucide-react';
+import { Copy, Share2, X } from 'lucide-react';
 
 interface ShareSheetProps {
   isOpen: boolean;
   isLoading: boolean;
-  isNativeShareSupported: boolean;
   shareUrl: string;
   errorMessage: string | null;
   urlLength: number;
@@ -12,13 +11,11 @@ interface ShareSheetProps {
   onClose: () => void;
   onCopyLink: () => void;
   onNativeShare: () => void;
-  onSaveJson: () => void;
 }
 
 export const ShareSheet = ({
   isOpen,
   isLoading,
-  isNativeShareSupported,
   shareUrl,
   errorMessage,
   urlLength,
@@ -27,7 +24,6 @@ export const ShareSheet = ({
   onClose,
   onCopyLink,
   onNativeShare,
-  onSaveJson,
 }: ShareSheetProps) => {
   if (!isOpen) return null;
 
@@ -83,7 +79,7 @@ export const ShareSheet = ({
             )}
             {isOverWarning && (
               <p className="text-xs text-red-600 mt-1">
-                URLが長すぎます。共有できない場合は JSON 保存を使ってください。
+                URLが長すぎます。共有できない場合はリンクをコピーして送信してください。
               </p>
             )}
           </>
@@ -98,23 +94,14 @@ export const ShareSheet = ({
             <Copy size={16} /> リンクをコピー
           </button>
 
-          {isNativeShareSupported && (
-            <button
-              onClick={onNativeShare}
-              className="w-full bg-white text-sky-700 border border-sky-200 rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-sky-50 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100"
-              disabled={isLoading}
-            >
-              <Share2 size={16} /> 他アプリで共有
-            </button>
-          )}
-
           <button
-            onClick={onSaveJson}
-            className="w-full bg-gray-50 text-gray-700 border border-gray-200 rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-gray-100 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100"
+            onClick={onNativeShare}
+            className="w-full bg-white text-sky-700 border border-sky-200 rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-sky-50 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100"
             disabled={isLoading}
           >
-            <Save size={16} /> JSONで保存
+            <Share2 size={16} /> 他アプリで共有
           </button>
+
         </div>
       </section>
     </div>

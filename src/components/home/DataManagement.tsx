@@ -1,18 +1,13 @@
-import { Download, Share2, Upload } from 'lucide-react';
-import type { ChangeEvent, RefObject } from 'react';
+import { Download, Share2 } from 'lucide-react';
 
 interface DataManagementProps {
-  fileInputRef: RefObject<HTMLInputElement | null>;
   onOpenShare: () => void;
   onExportCsv: () => void;
-  onLoadJson: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const DataManagement = ({
-  fileInputRef,
   onOpenShare,
   onExportCsv,
-  onLoadJson,
 }: DataManagementProps) => {
   return (
     // データ入出力の操作群をまとめたセクション。
@@ -27,21 +22,10 @@ export const DataManagement = ({
         </button>
         <button
           onClick={onExportCsv}
-          className="bg-white text-gray-700 border border-gray-200 py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 hover:bg-gray-50 active:scale-95 transition-all shadow-sm"
+          className="col-span-2 bg-white text-gray-700 border border-gray-200 py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 hover:bg-gray-50 active:scale-95 transition-all shadow-sm"
         >
           <Download size={16} /> CSV出力
         </button>
-        <label className="bg-orange-100 text-orange-600 border border-orange-200 py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 hover:bg-orange-200 active:scale-95 transition-all shadow-sm cursor-pointer">
-          <Upload size={16} /> JSONをロード
-          <input
-            type="file"
-            accept=".json"
-            // 見た目はラベルをボタン化し、input 自体は隠す。
-            className="hidden"
-            ref={fileInputRef}
-            onChange={onLoadJson}
-          />
-        </label>
       </div>
     </section>
   );
