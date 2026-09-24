@@ -7,7 +7,7 @@ import { ShareSheet } from '../components/home/ShareSheet';
 import { SettlementDetails } from '../components/home/SettlementDetails';
 import { SettlementSummary } from '../components/home/SettlementSummary';
 import type { EventData, ViewState } from '../types/domain';
-import { exportLogsAsCsv, readEventDataFromJsonFile, saveEventDataAsJson } from '../utils/dataIO';
+import { exportLogsAsCsv, readEventDataFromJsonFile } from '../utils/dataIO';
 import { encodeEventDataToUrlSafe } from '../utils/shareCodec';
 import { calculateSettlement } from '../utils/settlement';
 
@@ -44,12 +44,6 @@ export const HomeView = ({
 
   // eventData が変わるたびに精算結果を再計算する。
   const { transfers, logs, breakdowns } = useMemo(() => calculateSettlement(eventData), [eventData]);
-
-  // 現在データを JSON ダウンロード。
-  const handleSaveJson = () => {
-    saveEventDataAsJson(eventData);
-    showToast('イベントデータを保存しました');
-  };
 
   // JSON ファイル読込。成功時は eventData 全体を置き換える。
   const handleLoadJson = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -216,7 +210,6 @@ export const HomeView = ({
         onClose={() => setIsShareSheetOpen(false)}
         onCopyLink={handleCopyShareUrl}
         onNativeShare={handleNativeShare}
-        onSaveJson={handleSaveJson}
       />
     </div>
   );
